@@ -35,6 +35,7 @@ model Transaction {
   slipId      String?
   slip        Slip?    @relation(fields: [slipId], references: [id])
   createdAt   DateTime @default(now())
+  @@map("transactions")
 }
 
 model Slip {
@@ -48,4 +49,5 @@ model Slip {
   transactions Transaction[]
   createdAt    DateTime @default(now())
   processedAt  DateTime?
+  @@map("slips")
 }
