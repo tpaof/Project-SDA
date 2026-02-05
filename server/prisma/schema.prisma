@@ -18,6 +18,34 @@ model User {
   password  String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
+  transactions Transaction[]
+  slips     Slip[]
   @@map("users")
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  type        String   // income | expense
+  amount      Float
+  description String?
+  category    String?
+  date        DateTime
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  slipId      String?
+  slip        Slip?    @relation(fields: [slipId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model Slip {
+  id           String   @id @default(uuid())
+  filename     String
+  originalName String
+  status       String   // pending | processing | completed | failed
+  ocrResult    Json?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+  createdAt    DateTime @default(now())
+  processedAt  DateTime?
 }
