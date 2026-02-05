@@ -19,6 +19,10 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Auth routes
+import authRoutes from './routes/auth.routes.js';
+app.use('/api/auth', authRoutes);
+
 // API routes placeholder
 app.get('/api', (_req, res) => {
   res.json({ message: 'MoneyMate API v1.0' });
