@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/auth.service.js';
 import { registerSchema, loginSchema } from '../utils/validation.js';
+import { AppError } from '../utils/AppError.js';
 
 export class AuthController {
   async register(req: Request, res: Response): Promise<void> {
@@ -18,13 +19,12 @@ export class AuthController {
       const user = await authService.register(validation.data);
       res.status(201).json({ user });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Registration failed';
-      
-      if (message === 'Email already registered') {
-        res.status(409).json({ error: message });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ error: error.message });
         return;
       }
-
+      
+      const message = error instanceof Error ? error.message : 'Registration failed';
       res.status(500).json({ error: message });
     }
   }
@@ -44,13 +44,12 @@ export class AuthController {
       const result = await authService.login(validation.data);
       res.status(200).json(result);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed';
-      
-      if (message === 'Invalid email or password') {
-        res.status(401).json({ error: message });
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ error: error.message });
         return;
       }
 
+      const message = error instanceof Error ? error.message : 'Login failed';
       res.status(500).json({ error: message });
     }
   }
@@ -76,7 +75,11 @@ export class AuthController {
       }
 
       res.status(200).json({ user });
-    } catch {
+    } catch (error) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ error: error.message });
+        return;
+      }
       res.status(500).json({ error: 'Failed to fetch user' });
     }
   }

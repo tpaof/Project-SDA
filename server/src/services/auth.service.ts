@@ -1,10 +1,17 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../lib/db.js';
+import { AppError } from '../utils/AppError.js';
 import type { RegisterInput, LoginInput } from '../utils/validation.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-change-me';
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('FATAL: JWT_SECRET environment variable is not defined.');
+}
+
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+const SALT_ROUNDS = 12;
 
 export interface AuthPayload {
   userId: string;
@@ -24,10 +31,10 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new Error('Email already registered');
+      throw new AppError(409, 'Email already registered');
     }
 
-    const hashedPassword = await bcrypt.hash(data.password, 12);
+    const hashedPassword = await bcrypt.hash(data.password, SALT_ROUNDS);
 
     const user = await prisma.user.create({
       data: {
@@ -49,13 +56,13 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('Invalid email or password');
+      throw new AppError(401, 'Invalid email or password');
     }
 
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
 
     if (!isPasswordValid) {
-      throw new Error('Invalid email or password');
+      throw new AppError(401, 'Invalid email or password');
     }
 
     const payload: AuthPayload = {
@@ -63,7 +70,7 @@ export class AuthService {
       email: user.email,
     };
 
-    const token = jwt.sign(payload, JWT_SECRET, {
+    const token = jwt.sign(payload, JWT_SECRET as string, {
       expiresIn: JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'],
     });
 
@@ -79,10 +86,11 @@ export class AuthService {
 
   async validateToken(token: string): Promise<AuthPayload> {
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const decoded = jwt.verify(token, JWT_SECRET!) as AuthPayload;
       return decoded;
     } catch {
-      throw new Error('Invalid or expired token');
+      throw new AppError(401, 'Invalid or expired token');
     }
   }
 
