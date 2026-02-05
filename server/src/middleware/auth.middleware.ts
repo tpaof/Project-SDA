@@ -22,17 +22,20 @@ export async function authMiddleware(
       return;
     }
 
-    const token = authHeader.split(' ')[1];
-
-    if (!token) {
-      res.status(401).json({ error: 'Token not provided' });
+    const parts = authHeader.split(' ');
+    // Ensure properly formed Bearer token
+    if (parts.length !== 2 || !parts[1]) {
+      res.status(401).json({ error: 'Token not provided or malformed' });
       return;
     }
+
+    const token = parts[1];
 
     const payload = await authService.validateToken(token);
     req.user = payload;
     next();
-  } catch {
+  } catch (error) {
+    console.error('Auth Middleware Error:', error);
     res.status(401).json({ error: 'Invalid or expired token' });
   }
 }

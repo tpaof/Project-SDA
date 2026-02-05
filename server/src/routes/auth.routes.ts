@@ -5,11 +5,11 @@ import { authMiddleware } from '../middleware/auth.middleware.js';
 const router: Router = Router();
 
 // Public routes
-router.post('/register', (req, res) => authController.register(req, res));
-router.post('/login', (req, res) => authController.login(req, res));
-router.post('/logout', (req, res) => authController.logout(req, res));
+router.post('/register', authController.register.bind(authController));
+router.post('/login', authController.login.bind(authController));
+router.post('/logout', authController.logout.bind(authController));
 
 // Protected routes
-router.get('/me', authMiddleware, (req, res) => authController.me(req, res));
+router.get('/me', authMiddleware, authController.me.bind(authController));
 
 export default router;

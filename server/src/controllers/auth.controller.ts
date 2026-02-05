@@ -62,12 +62,9 @@ export class AuthController {
 
   async me(req: Request, res: Response): Promise<void> {
     try {
-      if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-      }
-
-      const user = await authService.getUserById(req.user.userId);
+      // Middleware ensures req.user is populated
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const user = await authService.getUserById(req.user!.userId);
 
       if (!user) {
         res.status(404).json({ error: 'User not found' });
