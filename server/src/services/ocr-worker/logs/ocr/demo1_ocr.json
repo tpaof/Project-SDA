@@ -1,0 +1,7 @@
+{
+  "job_id": "demo1",
+  "status": "failed",
+  "error": "job payload ไม่ครบ (job_id / image_path / callback_url)",
+  "traceback": "Traceback (most recent call last):\n  File \"/app/src/queue/consumer.py\", line 59, in start_consumer\n    raise ValueError(\"job payload ไม่ครบ (job_id / image_path / callback_url)\")\nValueError: job payload ไม่ครบ (job_id / image_path / callback_url)\n",
+  "timestamp": "2026-02-05T15:43:59.405647"
+}

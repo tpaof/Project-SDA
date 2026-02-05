@@ -1,0 +1,9 @@
+opencv-python
+pytesseract
+Pillow
+redis
+numpy
+python-dotenv
+flask
+opencv-python
+requests
