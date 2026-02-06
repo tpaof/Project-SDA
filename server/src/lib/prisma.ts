@@ -68,39 +68,53 @@ function classifyConnectionError(error: unknown): string {
  * Returns `{ ok: true }` on success, or `{ ok: false, errorType, message }` on failure.
  * Never throws – safe to call without crashing the process.
  */
-export async function connectPrisma(): Promise<
-  | { ok: true }
-  | { ok: false; errorType: string; message: string }
-> {
-  try {
-    // Lightweight connectivity check
-    await prisma.$queryRawUnsafe('SELECT 1');
-    return { ok: true };
-  } catch (error: unknown) {
-    const errorType = classifyConnectionError(error);
-    const rawMessage = error instanceof Error ? error.message : String(error);
+export async function connectPrisma(
+  options?: { retries?: number; delayMs?: number },
+): Promise<{ ok: true } | { ok: false; errorType: string; message: string }> {
+  const retries = options?.retries ?? 5;
+  const baseDelay = options?.delayMs ?? 500;
 
-    const friendlyMessages: Record<string, string> = {
-      DATABASE_UNREACHABLE:
-        'Could not reach the database server. Ensure PostgreSQL is running and the host/port in DATABASE_URL are correct.',
-      DATABASE_HOST_NOT_FOUND:
-        'The database host could not be resolved. Check the hostname in DATABASE_URL.',
-      DATABASE_TIMEOUT:
-        'The database connection timed out. The server may be overloaded or a firewall is blocking the connection.',
-      DATABASE_AUTH_FAILURE:
-        'Authentication failed. Verify the username and password in DATABASE_URL.',
-      DATABASE_SSL_ERROR:
-        'SSL negotiation failed. Check your SSL configuration and DATABASE_URL parameters.',
-      DATABASE_UNKNOWN_ERROR:
-        `An unexpected database error occurred: ${rawMessage}`,
-    };
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await prisma.$queryRawUnsafe('SELECT 1');
+      return { ok: true };
+    } catch (error: unknown) {
+      const errorType = classifyConnectionError(error);
+      const rawMessage = error instanceof Error ? error.message : String(error);
 
-    const friendlyMessage = friendlyMessages[errorType] ?? friendlyMessages.DATABASE_UNKNOWN_ERROR;
+      const friendlyMessages: Record<string, string> = {
+        DATABASE_UNREACHABLE:
+          'Could not reach the database server. Ensure PostgreSQL is running and the host/port in DATABASE_URL are correct.',
+        DATABASE_HOST_NOT_FOUND:
+          'The database host could not be resolved. Check the hostname in DATABASE_URL.',
+        DATABASE_TIMEOUT:
+          'The database connection timed out. The server may be overloaded or a firewall is blocking the connection.',
+        DATABASE_AUTH_FAILURE:
+          'Authentication failed. Verify the username and password in DATABASE_URL.',
+        DATABASE_SSL_ERROR:
+          'SSL negotiation failed. Check your SSL configuration and DATABASE_URL parameters.',
+        DATABASE_UNKNOWN_ERROR:
+          `An unexpected database error occurred: ${rawMessage}`,
+      };
 
-    console.error(`[prisma] Connection error (${errorType}): ${friendlyMessage}`);
+      const friendlyMessage = friendlyMessages[errorType] ?? friendlyMessages.DATABASE_UNKNOWN_ERROR;
 
-    return { ok: false, errorType, message: friendlyMessage };
+      console.warn(
+        `[prisma] Connection attempt ${attempt}/${retries} failed (${errorType}). Retrying...`,
+      );
+
+      if (attempt === retries) {
+        return { ok: false, errorType, message: friendlyMessage };
+      }
+
+      // exponential backoff
+      const delay = baseDelay * 2 ** (attempt - 1);
+      await new Promise((res) => setTimeout(res, delay));
+    }
   }
+
+  // unreachable
+  return { ok: false, errorType: 'DATABASE_UNKNOWN_ERROR', message: 'Unknown failure.' };
 }
 
 export default prisma;
