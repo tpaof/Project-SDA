@@ -2,8 +2,11 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import path from 'node:path';
 import authRoutes from './routes/auth.routes.ts';
 import transactionRoutes from './routes/transaction.routes.js';
+import slipRoutes from './routes/slip.routes.js';
+import { connectRedis } from './lib/redis.js';
 
 dotenv.config();
 
@@ -27,6 +30,12 @@ app.use('/api/auth', authRoutes);
 // Transaction routes
 app.use('/api/transactions', transactionRoutes);
 
+// Slip routes
+app.use('/api/slips', slipRoutes);
+
+// Serve uploaded files statically (behind auth in production you may want a signed URL)
+app.use('/uploads', express.static(path.resolve('uploads')));
+
 // API routes placeholder
 app.get('/api', (_req, res) => {
   res.json({ message: 'MoneyMate API v1.0' });
@@ -44,8 +53,14 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 });
 
 
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+const server = app.listen(PORT, async () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+
+  // Connect to Redis (non-blocking – the server still starts if Redis is unavailable)
+  const redisResult = await connectRedis();
+  if (!redisResult.ok) {
+    console.warn('[redis] Could not connect:', redisResult.message);
+  }
 });
 
 const gracefulShutdown = () => {
