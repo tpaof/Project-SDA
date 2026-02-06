@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { LogOut, Wallet, TrendingUp, TrendingDown, Plus, Upload, Receipt, PieChart, Bell, User } from "lucide-react";
+import { LogOut, Wallet, TrendingUp, TrendingDown, Plus, Upload, Receipt, PieChart, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const DashboardPage: React.FC = () => {

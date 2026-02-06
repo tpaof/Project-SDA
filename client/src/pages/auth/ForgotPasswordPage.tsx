@@ -2,18 +2,21 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import authService from "@/services/auth.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Wallet, Loader2, ArrowRight, ArrowLeft, Mail, CheckCircle2 } from "lucide-react";
+import { Wallet, Loader2, ArrowRight, ArrowLeft, Mail, CheckCircle2, Copy } from "lucide-react";
 
 export const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [resetUrl, setResetUrl] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
     if (!email.trim()) {
@@ -35,13 +38,37 @@ export const ForgotPasswordPage: React.FC = () => {
 
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await authService.forgotPassword({ email });
+      
+      // In development, the API returns resetUrl and token
+      // @ts-expect-error - dev response includes resetUrl which is not typed
+      if (response.resetUrl) {
+        // @ts-expect-error - dev response includes resetUrl which is not typed
+        setResetUrl(response.resetUrl);
+        // @ts-expect-error - dev response includes token which is not typed
+        setToken(response.token);
+      }
+      
+      setIsSubmitted(true);
+      toast.success("ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว", {
+        description: `กรุณาตรวจสอบอีเมล ${email}`,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+      setFormError(message);
+      toast.error("ไม่สามารถส่งลิงก์ได้", {
+        description: message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    setIsLoading(false);
-    setIsSubmitted(true);
-    toast.success("ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว", {
-      description: `กรุณาตรวจสอบอีเมล ${email}`,
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("คัดลอกแล้ว", {
+      description: "ลิงก์ถูกคัดลอกไปยังคลิปบอร์ด",
     });
   };
 
@@ -55,7 +82,7 @@ export const ForgotPasswordPage: React.FC = () => {
             opacity: [0.3, 0.5, 0.3],
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-amber-400/30 to-orange-500/20 rounded-full blur-3xl"
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-linear-to-br from-amber-400/30 to-orange-500/20 rounded-full blur-3xl"
         />
         <motion.div
           animate={{
@@ -63,7 +90,7 @@ export const ForgotPasswordPage: React.FC = () => {
             opacity: [0.2, 0.4, 0.2],
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-gradient-to-br from-orange-400/20 to-red-400/10 rounded-full blur-3xl"
+          className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-linear-to-br from-orange-400/20 to-red-400/10 rounded-full blur-3xl"
         />
 
         <div
@@ -93,9 +120,9 @@ export const ForgotPasswordPage: React.FC = () => {
             <motion.div
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
+              className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
             />
-            <div className="relative bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
               <Wallet className="h-10 w-10 text-white" />
             </div>
           </div>
@@ -119,7 +146,7 @@ export const ForgotPasswordPage: React.FC = () => {
               </>
             ) : (
               <>
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/20 mx-auto mb-4 shadow-inner">
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/20 mx-auto mb-4 shadow-inner">
                   <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-center">
@@ -161,7 +188,7 @@ export const ForgotPasswordPage: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
-                      className="h-12 pl-12 rounded-xl border-2 bg-white/70  backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                      className="h-12 pl-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
                     />
                   </div>
                 </div>
@@ -190,10 +217,41 @@ export const ForgotPasswordPage: React.FC = () => {
                 <p className="text-sm text-muted-foreground text-center">
                   หากคุณไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปม หรือลองอีกครั้งในอีกสักครู่
                 </p>
+                
+                {/* Development Only - Show Reset URL */}
+                {resetUrl && (
+                  <div className="p-4 rounded-xl bg-muted/50 space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      สำหรับทดสอบ (Development):
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={resetUrl}
+                        readOnly
+                        className="flex-1 text-xs p-2 rounded-lg bg-background border"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => copyToClipboard(resetUrl)}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Token: <code className="bg-background px-1 py-0.5 rounded">{token?.slice(0, 20)}...</code>
+                    </p>
+                  </div>
+                )}
+                
                 <Button
                   onClick={() => {
                     setIsSubmitted(false);
                     setEmail("");
+                    setResetUrl(null);
+                    setToken(null);
                   }}
                   variant="outline"
                   className="w-full h-12 rounded-xl"

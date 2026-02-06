@@ -72,7 +72,7 @@ export const LoginPage: React.FC = () => {
             opacity: [0.3, 0.5, 0.3],
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-amber-400/30 to-orange-500/20 rounded-full blur-3xl"
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] bg-linear-to-br from-amber-400/30 to-orange-500/20 rounded-full blur-3xl"
         />
         <motion.div 
           animate={{ 
@@ -80,14 +80,14 @@ export const LoginPage: React.FC = () => {
             opacity: [0.2, 0.4, 0.2],
           }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-gradient-to-br from-orange-400/20 to-red-400/10 rounded-full blur-3xl"
+          className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-linear-to-br from-orange-400/20 to-red-400/10 rounded-full blur-3xl"
         />
         <motion.div 
           animate={{ 
             y: [0, -20, 0],
           }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-amber-200/10 to-orange-200/5 rounded-full blur-3xl"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-linear-to-r from-amber-200/10 to-orange-200/5 rounded-full blur-3xl"
         />
         
         {/* Grid Pattern */}
@@ -118,9 +118,9 @@ export const LoginPage: React.FC = () => {
             <motion.div 
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
+              className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
             />
-            <div className="relative bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
               <Wallet className="h-10 w-10 text-white" />
             </div>
           </div>

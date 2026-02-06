@@ -10,6 +10,15 @@ export interface RegisterRequest {
   password: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
+
 export interface AuthResponse {
   token: string;
   user: {
@@ -38,8 +47,23 @@ export const authService = {
     return response.data;
   },
 
+  async forgotPassword(data: ForgotPasswordRequest): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>("/auth/forgot-password", data);
+    return response.data;
+  },
+
+  async resetPassword(data: ResetPasswordRequest): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>("/auth/reset-password", data);
+    return response.data;
+  },
+
+  async validateResetToken(token: string): Promise<{ valid: boolean; email: string }> {
+    const response = await api.get<{ valid: boolean; email: string }>(`/auth/validate-reset-token?token=${token}`);
+    return response.data;
+  },
+
   async verifyToken(): Promise<AuthResponse["user"]> {
-    const response = await api.get<AuthResponse["user"]>("/auth/me");
+    const response = await api.get<AuthResponse["user"]>>("/auth/me");
     return response.data;
   },
 
