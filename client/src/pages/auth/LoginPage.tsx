@@ -8,12 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Wallet, Eye, EyeOff, Loader2, Sparkles, ArrowRight, Shield } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Wallet, Eye, EyeOff, Loader2, Sparkles, ArrowRight } from "lucide-react";
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   
   const { login, isLoading, error, clearError } = useAuth();
@@ -47,9 +49,9 @@ export const LoginPage: React.FC = () => {
     if (!validateForm()) return;
 
     try {
-      await login(email, password);
+      await login(email, password, rememberMe);
       toast.success("เข้าสู่ระบบสำเร็จ!", {
-        description: "ยินดีต้อนรับกลับมา",
+        description: rememberMe ? "จดจำการเข้าสู่ระบบของคุณแล้ว" : "ยินดีต้อนรับกลับมา",
       });
       navigate("/dashboard");
     } catch {
@@ -135,10 +137,7 @@ export const LoginPage: React.FC = () => {
 
         <Card className="glass shadow-2xl shadow-black/5 border-white/60 dark:border-white/10">
           <CardHeader className="space-y-2 pb-6">
-            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/20 mb-2 mx-auto shadow-inner">
-              <Shield className="h-7 w-7 text-orange-600 dark:text-orange-400" />
-            </div>
-            <CardTitle className="text-2xl font-bold text-center">
+            <CardTitle className="text-2xl font-bold text-center pt-2">
               ยินดีต้อนรับกลับ
             </CardTitle>
             <CardDescription className="text-center text-base">
@@ -169,7 +168,7 @@ export const LoginPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="h-12 rounded-xl border-2 bg-white/70 dark:bg-gray-100/50 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                  className="h-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
                 />
               </div>
 
@@ -180,7 +179,7 @@ export const LoginPage: React.FC = () => {
                     รหัสผ่าน
                   </Label>
                   <Link 
-                    to="#" 
+                    to="/forgot-password" 
                     className="text-xs text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 font-medium transition-colors"
                   >
                     ลืมรหัสผ่าน?
@@ -194,7 +193,7 @@ export const LoginPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 dark:bg-gray-100/50 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
                   />
                   <button
                     type="button"
@@ -209,6 +208,16 @@ export const LoginPage: React.FC = () => {
                     )}
                   </button>
                 </div>
+              </div>
+
+              {/* Remember Me */}
+              <div className="flex items-center justify-between">
+                <Checkbox
+                  id="remember"
+                  label="จดจำฉันไว้"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
               </div>
 
               {/* Submit Button */}
@@ -250,7 +259,7 @@ export const LoginPage: React.FC = () => {
                 to="/register"
                 className="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors inline-flex items-center gap-1 group"
               >
-                สมัครสมาชิกฟรี
+                สมัครสมาชิก
                 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>

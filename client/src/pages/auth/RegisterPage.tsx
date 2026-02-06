@@ -208,7 +208,7 @@ export const RegisterPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="h-12 rounded-xl border-2 bg-white/70 dark:bg-gray-100/50 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                  className="h-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
                 />
               </div>
 
@@ -226,7 +226,7 @@ export const RegisterPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 dark:bg-gray-100/50 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
                   />
                   <button
                     type="button"
@@ -292,7 +292,7 @@ export const RegisterPage: React.FC = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 dark:bg-gray-100/50 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
                   />
                   <button
                     type="button"
@@ -330,7 +330,7 @@ export const RegisterPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    สมัครสมาชิกฟรี
+                    สมัครสมาชิก
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </>
                 )}
