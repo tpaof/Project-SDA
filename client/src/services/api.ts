@@ -10,10 +10,15 @@ export const api = axios.create({
   timeout: 10000,
 });
 
+// Helper function to get token from both storages
+const getToken = (): string | null => {
+  return localStorage.getItem("token") || sessionStorage.getItem("token");
+};
+
 // Request interceptor - เพิ่ม JWT token
 api.interceptors.request.use(
   (config: AxiosRequestConfig) => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,6 +37,9 @@ api.interceptors.response.use(
       // Token หมดอายุหรือไม่ถูกต้อง
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("remember_me");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("user");
       window.location.href = "/login";
     }
     return Promise.reject(error);

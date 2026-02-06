@@ -23,6 +23,10 @@ export interface ApiError {
   status: number;
 }
 
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
+const REMEMBER_KEY = "remember_me";
+
 export const authService = {
   async login(data: LoginRequest): Promise<AuthResponse> {
     const response = await api.post<AuthResponse>("/auth/login", data);
@@ -40,20 +44,49 @@ export const authService = {
   },
 
   logout(): void {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(REMEMBER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(USER_KEY);
   },
 
-  getStoredAuth(): { token: string | null; user: AuthResponse["user"] | null } {
-    const token = localStorage.getItem("token");
-    const userStr = localStorage.getItem("user");
+  getStorage(rememberMe: boolean = false): Storage {
+    return rememberMe ? localStorage : sessionStorage;
+  },
+
+  getStoredAuth(): { token: string | null; user: AuthResponse["user"] | null; rememberMe: boolean } {
+    // ตรวจสอบ localStorage ก่อน (remember me)
+    let token = localStorage.getItem(TOKEN_KEY);
+    let userStr = localStorage.getItem(USER_KEY);
+    let rememberMe = localStorage.getItem(REMEMBER_KEY) === "true";
+
+    // ถ้าไม่มีใน localStorage ให้ตรวจสอบ sessionStorage
+    if (!token) {
+      token = sessionStorage.getItem(TOKEN_KEY);
+      userStr = sessionStorage.getItem(USER_KEY);
+      rememberMe = false;
+    }
+
     const user = userStr ? JSON.parse(userStr) : null;
-    return { token, user };
+    return { token, user, rememberMe };
   },
 
-  setStoredAuth(token: string, user: AuthResponse["user"]): void {
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+  setStoredAuth(token: string, user: AuthResponse["user"], rememberMe: boolean = false): void {
+    const storage = this.getStorage(rememberMe);
+    
+    storage.setItem(TOKEN_KEY, token);
+    storage.setItem(USER_KEY, JSON.stringify(user));
+    
+    if (rememberMe) {
+      localStorage.setItem(REMEMBER_KEY, "true");
+    } else {
+      localStorage.removeItem(REMEMBER_KEY);
+    }
+  },
+
+  isRememberMe(): boolean {
+    return localStorage.getItem(REMEMBER_KEY) === "true";
   },
 };
 
