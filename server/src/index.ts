@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import authRoutes from './routes/auth.routes.js';
+import authRoutes from './routes/auth.routes.ts';
+import transactionRoutes from './routes/transaction.routes.js';
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ app.get('/health', (_req, res) => {
 
 // Auth routes
 app.use('/api/auth', authRoutes);
+
+// Transaction routes
+app.use('/api/transactions', transactionRoutes);
 
 // API routes placeholder
 app.get('/api', (_req, res) => {
