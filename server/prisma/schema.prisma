@@ -21,6 +21,8 @@ model User {
 
   // Relations
   passwordResetTokens PasswordResetToken[]
+  transactions        Transaction[]
+  slips               Slip[]
 
   @@map("users")
 }
@@ -40,14 +42,10 @@ model PasswordResetToken {
   @@index([token])
   @@map("password_reset_tokens")
 }
-  transactions Transaction[]
-  slips     Slip[]
-  @@map("users")
-}
 
 model Transaction {
   id          String   @id @default(uuid())
-  type        String   // income | expense
+  type        String // income | expense
   amount      Float
   description String?
   category    String?
@@ -57,19 +55,21 @@ model Transaction {
   slipId      String?
   slip        Slip?    @relation(fields: [slipId], references: [id])
   createdAt   DateTime @default(now())
+
   @@map("transactions")
 }
 
 model Slip {
-  id           String   @id @default(uuid())
+  id           String        @id @default(uuid())
   filename     String
   originalName String
-  status       String   // pending | processing | completed | failed
+  status       String // pending | processing | completed | failed
   ocrResult    Json?
   userId       String
-  user         User     @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
   transactions Transaction[]
-  createdAt    DateTime @default(now())
+  createdAt    DateTime      @default(now())
   processedAt  DateTime?
+
   @@map("slips")
 }
