@@ -2,13 +2,13 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const alertVariants = {
-  default: "bg-background text-foreground",
+  default: "bg-card text-foreground",
   destructive:
-    "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+    "border-destructive/50 text-destructive [&>svg]:text-destructive",
   success:
-    "border-green-500/50 text-green-700 dark:border-green-500 dark:text-green-400 [&>svg]:text-green-500",
+    "border-green-500/50 text-green-700 [&>svg]:text-green-500",
   warning:
-    "border-yellow-500/50 text-yellow-700 dark:border-yellow-500 dark:text-yellow-400 [&>svg]:text-yellow-500",
+    "border-yellow-500/50 text-yellow-700 [&>svg]:text-yellow-500",
 };
 
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {

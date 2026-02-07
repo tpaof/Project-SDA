@@ -88,7 +88,6 @@ export class AuthService {
 
   async validateToken(token: string): Promise<AuthPayload> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const decoded = jwt.verify(token, JWT_SECRET!) as AuthPayload;
       return decoded;
     } catch {

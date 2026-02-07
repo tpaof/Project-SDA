@@ -31,7 +31,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
           </div>
           <div className="text-center">
             <p className="text-lg font-semibold gradient-text">MoneyMate</p>
-            <p className="text-sm text-muted-foreground">กำลังโหลด...</p>
+            <p className="text-sm text-muted-foreground">Loading...</p>
           </div>
         </motion.div>
       </div>

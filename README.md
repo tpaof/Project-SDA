@@ -10,23 +10,27 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 
 ## 🛠️ Tech Stack
 
-| Technology   | Icon                                                                                                                  |
-| ------------ | --------------------------------------------------------------------------------------------------------------------- |
-| React        | ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)                    |
-| Vite         | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)                       |
-| TypeScript   | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)     |
-| Tailwind CSS | ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) |
-| Node.js      | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)            |
-| Express.js   | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)        |
-| Python       | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)                 |
-| Flask        | ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)                    |
-| Redis        | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)                    |
-| Docker       | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)                 |
-| Kubernetes   | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)     |
-| PostgreSQL   | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)     |
-| Prisma       | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)                 |
-| Terraform    | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)        |
-| pnpm         | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)                       |
+| Technology      | Icon                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| React           | ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)                             |
+| Vite            | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)                                |
+| TypeScript      | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)              |
+| Tailwind CSS    | ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)          |
+| React Hook Form | ![React Hook Form](https://img.shields.io/badge/React_Hook_Form-EC5990?style=for-the-badge&logo=reacthookform&logoColor=white) |
+| Zod             | ![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)                                   |
+| Recharts        | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge&logo=recharts&logoColor=white)                    |
+| Framer Motion   | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)            |
+| Node.js         | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)                     |
+| Express.js      | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)                 |
+| Python          | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)                          |
+| Flask           | ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)                             |
+| Redis           | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)                             |
+| Docker          | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)                          |
+| Kubernetes      | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)              |
+| PostgreSQL      | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)              |
+| Prisma          | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)                          |
+| Terraform       | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)                 |
+| pnpm            | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)                                |
 
 ---
 
@@ -203,6 +207,9 @@ MAX_FILE_SIZE=10485760
 - `POST /api/auth/login` - User login (returns JWT)
 - `POST /api/auth/logout` - Logout user
 - `GET /api/auth/me` - Get current authenticated user
+- `POST /api/auth/forgot-password` - Request password reset email
+- `POST /api/auth/reset-password` - Reset password with token
+- `GET /api/auth/validate-reset-token` - Validate reset token
 
 ### Transactions (`/api/transactions`)
 
@@ -312,15 +319,19 @@ fix: resolve JWT token expiration issue
 
 - **📸 Slip Upload & OCR**: Upload receipt images and automatically extract transaction data
 - **🔐 JWT Authentication**: Secure user authentication with JSON Web Tokens
+- **🔑 Password Recovery**: Forgot password and reset password functionality with secure tokens
 - **💳 Transaction Management**: Track income and expenses with categorization
 - **📊 Dashboard Analytics**: Visualize spending patterns and financial summaries
+- **📈 Interactive Charts**: Spending breakdown, monthly trends, and category analysis with Recharts
+- **🎨 Modern UI/UX**: Polished interface with Framer Motion animations and responsive design
+- **📝 Form Validation**: Robust form handling with React Hook Form and Zod validation
 - **⚡ Event-Driven Architecture**: Async OCR processing with Redis Pub/Sub
 - **🐳 Containerized**: Docker support for all microservices
 - **☸️ Kubernetes-Ready**: K8s manifests for scalable deployment
 - **🏗️ Infrastructure as Code**: Terraform configurations for cloud provisioning
 - **🔄 Horizontal Scaling**: OCR workers scale independently based on load
 - **📦 Monorepo Structure**: Managed with pnpm workspace
-- **🎨 Modern UI**: Responsive design with React and TailwindCSS
+- **🎨 Tailwind CSS**: Utility-first styling with custom design system
 - **🔒 Security**: Password hashing, HTTPS support, helmet middleware
 
 ---

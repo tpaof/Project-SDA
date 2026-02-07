@@ -1,286 +1,818 @@
-import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect, useMemo } from "react";
+import { Navigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { format } from "date-fns";
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowUp,
+  ArrowDown,
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  Plus,
+  Search,
+  MoreHorizontal,
+  Receipt,
+  Trash2,
+  Edit2,
+  Calendar,
+} from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { LogOut, Wallet, TrendingUp, TrendingDown, Plus, Upload, Receipt, PieChart, Bell } from "lucide-react";
-import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTransactions } from "@/hooks/useTransactions";
+import { TransactionModal } from "@/components/TransactionModal";
+import { Pagination } from "@/components/Pagination";
+import { SpendingChart } from "@/components/dashboard/SpendingChart";
+import { MonthlyChart } from "@/components/dashboard/MonthlyChart";
+import { TrendChart } from "@/components/dashboard/TrendChart";
+import { cn } from "@/lib/utils";
+import type { Transaction, CreateTransactionRequest, UpdateTransactionRequest } from "@/services/transaction.service";
 
-export const DashboardPage: React.FC = () => {
-  const { user, logout } = useAuth();
 
-  const statsCards = [
-    {
-      title: "ยอดเงินคงเหลือ",
-      amount: "฿0.00",
-      description: "เริ่มต้นบันทึกรายการเลย",
-      icon: Wallet,
-      gradient: "from-blue-500 to-blue-600",
-      bgGradient: "from-blue-50 to-blue-100/50 dark:from-blue-950/30 dark:to-blue-900/20",
-      textColor: "text-blue-600 dark:text-blue-400",
-      shadowColor: "shadow-blue-500/20",
-    },
-    {
-      title: "รายรับเดือนนี้",
-      amount: "฿0.00",
-      description: "0 รายการ",
-      icon: TrendingUp,
-      gradient: "from-emerald-500 to-green-600",
-      bgGradient: "from-emerald-50 to-green-100/50 dark:from-emerald-950/30 dark:to-green-900/20",
-      textColor: "text-emerald-600 dark:text-emerald-400",
-      shadowColor: "shadow-emerald-500/20",
-    },
-    {
-      title: "รายจ่ายเดือนนี้",
-      amount: "฿0.00",
-      description: "0 รายการ",
-      icon: TrendingDown,
-      gradient: "from-rose-500 to-red-600",
-      bgGradient: "from-rose-50 to-red-100/50 dark:from-rose-950/30 dark:to-red-900/20",
-      textColor: "text-rose-600 dark:text-rose-400",
-      shadowColor: "shadow-rose-500/20",
-    },
-  ];
+// ============================================
+// TYPES
+// ============================================
+interface FilterState {
+  search: string;
+  type: "" | "income" | "expense";
+  category: string;
+  sortBy: "date" | "amount";
+  sortOrder: "desc" | "asc";
+  startDate: string;
+  endDate: string;
+}
 
-  const quickActions = [
-    { 
-      icon: Plus, 
-      label: "บันทึกรายรับ", 
-      gradient: "from-emerald-500 to-green-600",
-      shadow: "shadow-emerald-500/30",
-    },
-    { 
-      icon: Receipt, 
-      label: "บันทึกรายจ่าย", 
-      gradient: "from-rose-500 to-red-600",
-      shadow: "shadow-rose-500/30",
-    },
-    { 
-      icon: Upload, 
-      label: "อัปโหลดสลิป", 
-      gradient: "from-blue-500 to-indigo-600",
-      shadow: "shadow-blue-500/30",
-    },
-    { 
-      icon: PieChart, 
-      label: "ดูรายงาน", 
-      gradient: "from-violet-500 to-purple-600",
-      shadow: "shadow-violet-500/30",
-    },
-  ];
+// ============================================
+// TRANSACTION ROW COMPONENT
+// ============================================
+interface TransactionRowProps {
+  transaction: Transaction;
+  onEdit: (transaction: Transaction) => void;
+  onDelete: (id: string) => void;
+}
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
+const TransactionRow = ({ transaction, onEdit, onDelete }: TransactionRowProps) => {
+  const isIncome = transaction.type === "income";
+
+  return (
+    <motion.tr
+      layout
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="group border-b border-border/50 hover:bg-muted/30 transition-colors"
+    >
+      <td className="py-4 pl-6">
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md",
+            isIncome ? "gradient-income" : "gradient-expense"
+          )}>
+            {isIncome ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+          </div>
+          <div>
+            <p className="font-semibold text-sm">{transaction.description || transaction.category || "Uncategorized"}</p>
+            <p className="text-xs text-muted-foreground">{format(new Date(transaction.date), "MMM d, yyyy")}</p>
+          </div>
+        </div>
+      </td>
+      <td className="py-4">
+        <Badge variant={isIncome ? "success" : "destructive"} className="font-medium">
+          {transaction.category || "Uncategorized"}
+        </Badge>
+      </td>
+      <td className="py-4">
+        <Badge variant="outline" className={cn(
+          "font-medium",
+          isIncome ? "border-green-500/30 text-green-600 bg-green-500/10" : "border-red-500/30 text-red-600 bg-red-500/10"
+        )}>
+          {isIncome ? "Income" : "Expense"}
+        </Badge>
+      </td>
+      <td className="py-4 text-right pr-6">
+        <span className={cn(
+          "font-bold font-['Plus_Jakarta_Sans']",
+          isIncome ? "text-green-600" : "text-red-600"
+        )}>
+          {isIncome ? "+" : "-"}฿{transaction.amount.toLocaleString()}
+        </span>
+      </td>
+      <td className="py-4 pr-6">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+            <DropdownMenuItem onClick={() => onEdit(transaction)} className="gap-2 hover:bg-gray-100">
+              <Edit2 className="w-4 h-4" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(transaction.id)} className="gap-2 text-red-600 hover:bg-red-50">
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </td>
+    </motion.tr>
+  );
+};
+
+// ============================================
+// FILTER BAR COMPONENT
+// ============================================
+interface FilterBarProps {
+  filters: FilterState;
+  onFilterChange: (filters: FilterState) => void;
+  onAddClick: () => void;
+  transactions: Transaction[];
+}
+
+// ============================================
+// DATE RANGE FILTER COMPONENT
+// ============================================
+interface DateRangeFilterProps {
+  filters: FilterState;
+  onFilterChange: (filters: FilterState) => void;
+}
+
+const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
+  const handleQuickSelect = (days: number) => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - days);
+    
+    onFilterChange({
+      ...filters,
+      startDate: start.toISOString().split("T")[0],
+      endDate: end.toISOString().split("T")[0],
+    });
+  };
+
+  const handleClear = () => {
+    onFilterChange({
+      ...filters,
+      startDate: "",
+      endDate: "",
+    });
+  };
+
+  const hasDateRange = filters.startDate || filters.endDate;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.15 }}
+      className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm"
+    >
+      <div className="flex items-center gap-2">
+        <Calendar className="w-4 h-4 text-gray-500" />
+        <span className="text-sm font-medium text-gray-700">Date Range:</span>
+      </div>
+      
+      <div className="flex items-center gap-2">
+        <input
+          type="date"
+          value={filters.startDate}
+          onChange={(e) => onFilterChange({ ...filters, startDate: e.target.value })}
+          className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          placeholder="Start Date"
+        />
+        <span className="text-gray-400">-</span>
+        <input
+          type="date"
+          value={filters.endDate}
+          onChange={(e) => onFilterChange({ ...filters, endDate: e.target.value })}
+          className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          placeholder="End Date"
+        />
+      </div>
+
+      <div className="flex items-center gap-1.5 ml-auto">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleQuickSelect(7)}
+          className="text-xs h-8 px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+        >
+          7 Days
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleQuickSelect(30)}
+          className="text-xs h-8 px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+        >
+          30 Days
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => handleQuickSelect(90)}
+          className="text-xs h-8 px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+        >
+          3 Months
+        </Button>
+        {hasDateRange && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClear}
+            className="text-xs h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            Clear
+          </Button>
+        )}
+      </div>
+    </motion.div>
+  );
+};
+
+// ============================================
+// FILTER BAR COMPONENT
+// ============================================
+const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: FilterBarProps) => {
+  // Get unique categories from transactions
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set<string>();
+    transactions.forEach((t) => {
+      if (t.category) uniqueCategories.add(t.category);
+    });
+    return Array.from(uniqueCategories).sort();
+  }, [transactions]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between"
+    >
+      <div className="flex flex-wrap items-center gap-4 flex-1">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search transactions..."
+            value={filters.search}
+            onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
+            className="pl-10 w-[260px] border border-gray-200 bg-white"
+          />
+        </div>
+        <Select
+          value={filters.type}
+          onValueChange={(value) => onFilterChange({ ...filters, type: value as FilterState["type"] })}
+        >
+          <SelectTrigger className="w-[140px] border border-gray-200 bg-white">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="income">Income</SelectItem>
+            <SelectItem value="expense">Expense</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={filters.category}
+          onValueChange={(value) => onFilterChange({ ...filters, category: value })}
+        >
+          <SelectTrigger className="w-[150px] border border-gray-200 bg-white">
+            <SelectValue placeholder="All Categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={`${filters.sortBy}-${filters.sortOrder}`}
+          onValueChange={(value) => {
+            const [sortBy, sortOrder] = value.split("-") as [FilterState["sortBy"], FilterState["sortOrder"]];
+            onFilterChange({ ...filters, sortBy, sortOrder });
+          }}
+        >
+          <SelectTrigger className="w-[140px] border border-gray-200 bg-white">
+            <div className="flex items-center gap-2">
+              {filters.sortBy === "date" ? (
+                <>
+                  <Calendar className="w-4 h-4 text-gray-500" />
+                  <span>Date</span>
+                </>
+              ) : (
+                <>
+                  <span>Amount</span>
+                </>
+              )}
+              {filters.sortOrder === "desc" ? (
+                <ArrowDown className="w-4 h-4 text-gray-500" />
+              ) : (
+                <ArrowUp className="w-4 h-4 text-gray-500" />
+              )}
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date-desc">Date (Newest)</SelectItem>
+            <SelectItem value="date-asc">Date (Oldest)</SelectItem>
+            <SelectItem value="amount-desc">Amount (High to Low)</SelectItem>
+            <SelectItem value="amount-asc">Amount (Low to High)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <Button onClick={onAddClick} className="btn-gradient text-white border-0 gap-2">
+        <Plus className="w-4 h-4" />
+        Add Transaction
+      </Button>
+    </motion.div>
+  );
+};
+
+// ============================================
+// MAIN DASHBOARD PAGE
+// ============================================
+export function DashboardPage() {
+  const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
+  const { transactions, pagination, isLoading, fetchTransactions, deleteTransaction, createTransaction, updateTransaction } = useTransactions();
+  
+  const [filters, setFilters] = useState<FilterState>({
+    search: "",
+    type: "",
+    category: "",
+    sortBy: "date",
+    sortOrder: "desc",
+    startDate: "",
+    endDate: "",
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
+
+  // Hide-on-scroll navbar state
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Show header when scrolling up or at top
+      if (currentScrollY < lastScrollY || currentScrollY < 10) {
+        setIsHeaderVisible(true);
+      } else {
+        // Hide header when scrolling down and past threshold
+        setIsHeaderVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  // Filter and sort transactions
+  const filteredTransactions = useMemo(() => {
+    const filtered = transactions.filter((t) => {
+      const matchesSearch =
+        !filters.search ||
+        t.description?.toLowerCase().includes(filters.search.toLowerCase()) ||
+        t.category?.toLowerCase().includes(filters.search.toLowerCase());
+      const matchesType = !filters.type || t.type === filters.type;
+      const matchesCategory = !filters.category || t.category === filters.category;
+      
+      // Date range filter
+      const transactionDate = new Date(t.date);
+      const matchesStartDate = !filters.startDate || transactionDate >= new Date(filters.startDate);
+      const matchesEndDate = !filters.endDate || transactionDate <= new Date(filters.endDate);
+      
+      return matchesSearch && matchesType && matchesCategory && matchesStartDate && matchesEndDate;
+    });
+
+    // Sort transactions
+    return filtered.sort((a, b) => {
+      if (filters.sortBy === "date") {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+        return filters.sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      } else {
+        return filters.sortOrder === "asc" ? a.amount - b.amount : b.amount - a.amount;
+      }
+    });
+  }, [transactions, filters]);
+
+  // Calculate filtered summary
+  const filteredSummary = useMemo(() => {
+    const totalIncome = filteredTransactions
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const totalExpense = filteredTransactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + t.amount, 0);
+    return {
+      totalIncome,
+      totalExpense,
+      balance: totalIncome - totalExpense,
+    };
+  }, [filteredTransactions]);
+
+  // Redirect if not authenticated
+  if (!authLoading && !isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+
+  // Handlers
+  const handleAddClick = () => {
+    setEditingTransaction(undefined);
+    setIsModalOpen(true);
+  };
+
+  const handleEditClick = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = async (id: string) => {
+    if (confirm("Are you sure you want to delete this transaction?")) {
+      await deleteTransaction(id);
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setEditingTransaction(undefined);
   };
+
+  const handleSubmit = async (data: CreateTransactionRequest | UpdateTransactionRequest) => {
+    if (editingTransaction) {
+      await updateTransaction(editingTransaction.id, data as UpdateTransactionRequest);
+    } else {
+      await createTransaction(data as CreateTransactionRequest);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    fetchTransactions({ page, limit: 10 });
+  };
+
+  // Loading state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-bg">
-      {/* Header */}
-      <header className="sticky top-0 z-50 glass border-b border-border/50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl blur-lg opacity-60" />
-                <div className="relative bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 p-2.5 rounded-xl shadow-lg">
-                  <Wallet className="h-5 w-5 text-white" />
-                </div>
+      {/* Header - Hide on Scroll */}
+      <header 
+        className={cn(
+          "fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur-sm transition-transform duration-300 ease-in-out",
+          isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3"
+            >
+              <div className="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center text-white shadow-lg">
+                <Wallet className="w-5 h-5" />
               </div>
-              <span className="text-xl font-bold gradient-text hidden sm:block">MoneyMate</span>
-            </div>
-
-            {/* Right Side */}
-            <div className="flex items-center gap-3">
-              <button className="relative p-2.5 rounded-xl hover:bg-muted transition-colors">
-                <Bell className="h-5 w-5 text-muted-foreground" />
-                <span className="absolute top-2 right-2 h-2 w-2 bg-rose-500 rounded-full ring-2 ring-background" />
-              </button>
-              
-              <div className="h-6 w-px bg-border hidden sm:block" />
-              
-              <div className="flex items-center gap-3 pl-2">
-                <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-sm font-medium">{user?.email?.split('@')[0]}</span>
-                  <span className="text-xs text-muted-foreground">{user?.email}</span>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-semibold shadow-lg">
-                  {user?.email?.[0].toUpperCase()}
-                </div>
+              <div>
+                <h1 className="text-xl font-bold font-['Plus_Jakarta_Sans'] gradient-text">
+                  MoneyMate
+                </h1>
+                <p className="text-xs text-muted-foreground">Personal Finance</p>
               </div>
+            </motion.div>
 
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={logout}
-                className="rounded-xl hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/30"
-              >
-                <LogOut className="h-5 w-5" />
-              </Button>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
+              <span className="hidden md:block text-sm text-muted-foreground">
+                {user?.email}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10 border-2 border-primary/20">
+                      <AvatarFallback className="bg-linear-to-br from-orange-400 to-red-500 text-white font-semibold">
+                        {(user?.email?.[0] || "U").toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 border border-gray-200 bg-white shadow-lg">
+                  <div className="flex flex-col space-y-1 p-2">
+                    <p className="text-sm font-medium">Account</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                  <DropdownMenuItem onClick={logout} className="text-red-600">
+                    <ArrowDownRight className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </motion.div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome */}
-        <motion.div 
+      {/* Main Content - Add pt-20 for fixed header */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        {/* Welcome Section */}
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold mb-2">
-            สวัสดี, <span className="gradient-text">{user?.email?.split('@')[0] || 'ผู้ใช้'}</span> 👋
-          </h1>
-          <p className="text-muted-foreground">
-            วันนี้เป็นวันดีที่จะเริ่มบันทึกการเงินของคุณ
-          </p>
+          <h2 className="text-3xl font-bold font-['Plus_Jakarta_Sans']">
+            Welcome back,👋
+          </h2>
+          <p className="text-muted-foreground mt-1">Here's what's happening with your money today.</p>
         </motion.div>
 
-        {/* Stats Cards */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-8"
-        >
-          {statsCards.map((card) => (
-            <motion.div key={card.title} variants={itemVariants}>
-              <Card className={`group relative overflow-hidden border-0 shadow-lg ${card.shadowColor} hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br ${card.bgGradient}`}>
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${card.gradient} opacity-10 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-500`} />
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {card.title}
-                  </CardTitle>
-                  <div className={`p-2 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg`}>
-                    <card.icon className="h-4 w-4 text-white" />
-                  </div>
-                </CardHeader>
-                <CardContent className="relative">
-                  <div className={`text-3xl font-bold ${card.textColor}`}>
-                    {card.amount}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {card.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Quick Actions */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-8"
-        >
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500">
-              <Plus className="h-4 w-4 text-white" />
-            </div>
-            การทำงานลัด
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {quickActions.map((action, index) => (
-              <motion.button
-                key={action.label}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4 + index * 0.05 }}
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={`group flex flex-col items-center gap-3 p-5 rounded-2xl bg-gradient-to-br ${action.gradient} ${action.shadow} shadow-lg text-white transition-all duration-300`}
-              >
-                <action.icon className="h-6 w-6 group-hover:scale-110 transition-transform" />
-                <span className="text-sm font-medium">{action.label}</span>
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Two Column Layout */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Recent Transactions */}
+        {/* Summary Cards - Compact Row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
           >
-            <Card className="border-0 shadow-lg shadow-black/5 h-full">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500">
-                    <Receipt className="h-4 w-4 text-white" />
+            <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Total Balance</p>
+                    <h3 className="text-2xl font-bold text-orange-600">
+                      ฿{(filteredSummary.balance || 0).toLocaleString()}
+                    </h3>
                   </div>
-                  รายการล่าสุด
-                </CardTitle>
-                <CardDescription>
-                  รายการรายรับรายจ่ายล่าสุดของคุณ
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
-                    <Receipt className="h-10 w-10 text-muted-foreground/40" />
+                  <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+                    <Wallet className="w-5 h-5 text-orange-600" />
                   </div>
-                  <h4 className="text-lg font-medium text-muted-foreground">ยังไม่มีรายการ</h4>
-                  <p className="text-sm text-muted-foreground/70 mt-1">
-                    เริ่มต้นบันทึกรายรับรายจ่าย หรืออัปโหลดสลิปโอนเงิน
-                  </p>
-                  <Button className="mt-4 rounded-xl btn-gradient text-white border-0">
-                    <Plus className="h-4 w-4 mr-2" />
-                    เพิ่มรายการแรก
-                  </Button>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Monthly Overview */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.15 }}
           >
-            <Card className="border-0 shadow-lg shadow-black/5 h-full">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500">
-                    <PieChart className="h-4 w-4 text-white" />
+            <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Income</p>
+                    <h3 className="text-2xl font-bold text-green-600">
+                      ฿{(filteredSummary.totalIncome || 0).toLocaleString()}
+                    </h3>
                   </div>
-                  ภาพรวมเดือนนี้
-                </CardTitle>
-                <CardDescription>
-                  สรุปรายรับรายจ่ายประจำเดือน
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center mb-4">
-                    <PieChart className="h-10 w-10 text-muted-foreground/40" />
+                  <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
                   </div>
-                  <h4 className="text-lg font-medium text-muted-foreground">ยังไม่มีข้อมูล</h4>
-                  <p className="text-sm text-muted-foreground/70 mt-1">
-                    เริ่มบันทึกรายการเพื่อดูกราฟสรุป
-                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Expenses</p>
+                    <h3 className="text-2xl font-bold text-red-600">
+                      ฿{(filteredSummary.totalExpense || 0).toLocaleString()}
+                    </h3>
+                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                    <TrendingDown className="w-5 h-5 text-red-600" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
+
+        {/* Charts Row 1 - Pie & Bar */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
+          {/* Pie Chart - Category Distribution (5 cols) */}
+          <motion.div
+            className="lg:col-span-5"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.25 }}
+          >
+            <Card className="bg-white border border-gray-200 h-full">
+              <CardHeader className="pb-3 border-b border-gray-100">
+                <CardTitle className="text-sm font-semibold text-gray-700">
+                  Spending by Category
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="h-[260px]">
+                  <SpendingChart transactions={filteredTransactions} isLoading={isLoading} />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Bar Chart - Monthly Comparison (7 cols) */}
+          <motion.div
+            className="lg:col-span-7"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+          >
+            <Card className="bg-white border border-gray-200 h-full">
+              <CardHeader className="pb-3 border-b border-gray-100">
+                <CardTitle className="text-sm font-semibold text-gray-700">
+                  Income vs Expenses
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <div className="h-[260px]">
+                  <MonthlyChart transactions={filteredTransactions} isLoading={isLoading} />
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Charts Row 2 - Balance Trend (Full Width) */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.35 }}
+        >
+          <Card className="bg-white border border-gray-200">
+            <CardHeader className="pb-3 border-b border-gray-100">
+              <CardTitle className="text-sm font-semibold text-gray-700">
+                Balance Trend
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="h-[320px]">
+                <TrendChart transactions={filteredTransactions} isLoading={isLoading} />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Date Range Filter */}
+        <div className="mb-6">
+          <DateRangeFilter filters={filters} onFilterChange={setFilters} />
+        </div>
+
+        {/* Transactions Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="space-y-4"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="text-xl font-bold font-['Plus_Jakarta_Sans']">Recent Transactions</h3>
+            <FilterBar filters={filters} onFilterChange={setFilters} onAddClick={handleAddClick} transactions={transactions} />
+          </div>
+
+          <Card className="border border-gray-200 bg-white overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border/50 bg-muted/30">
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Transaction
+                    </th>
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="text-left py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="text-right py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="py-3 px-6 w-16"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence mode="popLayout">
+                    {isLoading ? (
+                      [...Array(5)].map((_, i) => (
+                        <tr key={i}>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-3">
+                              <Skeleton className="w-10 h-10 rounded-xl" />
+                              <div className="space-y-2">
+                                <Skeleton className="h-4 w-32" />
+                                <Skeleton className="h-3 w-20" />
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-6"><Skeleton className="h-6 w-20" /></td>
+                          <td className="py-4 px-6"><Skeleton className="h-6 w-16" /></td>
+                          <td className="py-4 px-6"><Skeleton className="h-6 w-24 ml-auto" /></td>
+                          <td className="py-4 px-6"></td>
+                        </tr>
+                      ))
+                    ) : filteredTransactions.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-12 text-center">
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                              <Receipt className="w-8 h-8 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-lg">No transactions found</p>
+                              <p className="text-sm text-muted-foreground">
+                                Get started by adding your first transaction
+                              </p>
+                            </div>
+                            <Button onClick={handleAddClick} className="btn-gradient text-white border-0 mt-2">
+                              <Plus className="w-4 h-4 mr-2" />
+                              Add Transaction
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredTransactions.map((transaction) => (
+                        <TransactionRow
+                          key={transaction.id}
+                          transaction={transaction}
+                          onEdit={handleEditClick}
+                          onDelete={handleDeleteClick}
+                        />
+                      ))
+                    )}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="py-4 px-6 border-t border-border/50">
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.totalPages}
+                  onPageChange={handlePageChange}
+                />
+              </div>
+            )}
+          </Card>
+        </motion.div>
       </main>
+
+      {/* Transaction Modal */}
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        transaction={editingTransaction}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
-};
-
-export default DashboardPage;
+}

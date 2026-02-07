@@ -1,25 +1,6 @@
-import React, {
-  createContext,
-  useState,
-  useCallback,
-  useEffect,
-  ReactNode,
-} from "react";
+import React, { useState, useCallback, useEffect, type ReactNode } from "react";
 import authService, { type AuthResponse } from "@/services/auth.service";
-
-interface AuthContextType {
-  user: AuthResponse["user"] | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  error: string | null;
-  clearError: () => void;
-  rememberMe: boolean;
-}
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./auth-context";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -31,19 +12,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
-  // ตรวจสอบ token ตอนโหลดหน้า
+  // Check token on page load
   useEffect(() => {
     const initAuth = async () => {
       const { token, user: storedUser, rememberMe: storedRememberMe } = authService.getStoredAuth();
       
       if (token && storedUser) {
         try {
-          // Verify token กับ server
+          // Verify token with server
           const userData = await authService.verifyToken();
-          setUser(userData);
+          // Merge with stored user data to preserve name if API doesn't return it
+          setUser({ ...storedUser, ...userData });
           setRememberMe(storedRememberMe);
         } catch {
-          // Token ไม่ valid
+          // Token not valid
           authService.logout();
           setUser(null);
           setRememberMe(false);
@@ -63,10 +45,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authService.login({ email, password });
       authService.setStoredAuth(response.token, response.user, remember);
+      
       setUser(response.user);
       setRememberMe(remember);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "เข้าสู่ระบบล้มเหลว";
+      const message = err instanceof Error ? err.message : "Login failed";
       setError(message);
       throw err;
     } finally {
@@ -84,7 +67,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
       setRememberMe(false);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "สมัครสมาชิกล้มเหลว";
+      const message = err instanceof Error ? err.message : "Registration failed";
       setError(message);
       throw err;
     } finally {
@@ -103,13 +86,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setError(null);
   }, []);
 
-  const value: AuthContextType = {
+  const forgotPassword = useCallback(async (email: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await authService.forgotPassword({ email });
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to send reset email";
+      setError(message);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const resetPassword = useCallback(async (token: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      await authService.resetPassword({ token, password });
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to reset password";
+      setError(message);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const value = {
     user,
     isAuthenticated: !!user,
     isLoading,
     login,
     register,
     logout,
+    forgotPassword,
+    resetPassword,
     error,
     clearError,
     rememberMe,

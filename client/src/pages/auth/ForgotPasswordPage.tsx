@@ -20,11 +20,11 @@ export const ForgotPasswordPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!email.trim()) {
-      setFormError("กรุณากรอกอีเมล");
+      setFormError("Please enter your email");
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("รูปแบบอีเมลไม่ถูกต้อง");
+      setFormError("Invalid email format");
       return false;
     }
     return true;
@@ -51,13 +51,13 @@ export const ForgotPasswordPage: React.FC = () => {
       }
       
       setIsSubmitted(true);
-      toast.success("ส่งลิงก์รีเซ็ตรหัสผ่านแล้ว", {
-        description: `กรุณาตรวจสอบอีเมล ${email}`,
+      toast.success("Check your email", {
+        description: `We've sent a reset link to ${email}`,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+      const message = error instanceof Error ? error.message : "An error occurred. Please try again.";
       setFormError(message);
-      toast.error("ไม่สามารถส่งลิงก์ได้", {
+      toast.error("Could not send link", {
         description: message,
       });
     } finally {
@@ -67,8 +67,8 @@ export const ForgotPasswordPage: React.FC = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("คัดลอกแล้ว", {
-      description: "ลิงก์ถูกคัดลอกไปยังคลิปบอร์ด",
+    toast.success("Link copied", {
+      description: "Reset link copied to clipboard",
     });
   };
 
@@ -94,7 +94,7 @@ export const ForgotPasswordPage: React.FC = () => {
         />
 
         <div
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)`,
             backgroundSize: "60px 60px",
@@ -114,7 +114,7 @@ export const ForgotPasswordPage: React.FC = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col items-center justify-center mb-8"
+          className="flex items-center justify-center gap-4 mb-8"
         >
           <div className="relative">
             <motion.div
@@ -122,38 +122,38 @@ export const ForgotPasswordPage: React.FC = () => {
               transition={{ duration: 2, repeat: Infinity }}
               className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
             />
-            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
-              <Wallet className="h-10 w-10 text-white" />
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-3 rounded-2xl shadow-2xl shadow-orange-500/30">
+              <Wallet className="h-8 w-8 text-white" />
             </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="text-left">
             <h1 className="text-3xl font-bold gradient-text tracking-tight">
               MoneyMate
             </h1>
           </div>
         </motion.div>
 
-        <Card className="glass shadow-2xl shadow-black/5 border-white/60 dark:border-white/10">
+        <Card className="shadow-2xl border-border/70">
           <CardHeader className="space-y-2 pb-6">
             {!isSubmitted ? (
               <>
                 <CardTitle className="text-2xl font-bold text-center pt-2">
-                  ลืมรหัสผ่าน?
+                  Forgot Password?
                 </CardTitle>
                 <CardDescription className="text-center text-base">
-                  กรอกอีเมลของคุณ เราจะส่งลิงก์สำหรับรีเซ็ตรหัสผ่าน
+                  Enter your email and we'll send you a password reset link
                 </CardDescription>
               </>
             ) : (
               <>
-                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/20 mx-auto mb-4 shadow-inner">
-                  <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+                <div className="flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br from-emerald-100 to-green-100">
+                  <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                 </div>
                 <CardTitle className="text-2xl font-bold text-center">
-                  ตรวจสอบอีเมลของคุณ
+                  Check Your Email
                 </CardTitle>
                 <CardDescription className="text-center text-base">
-                  เราได้ส่งลิงก์รีเซ็ตรหัสผ่านไปที่ {email}
+                  We've sent a password reset link to {email}
                 </CardDescription>
               </>
             )}
@@ -164,7 +164,7 @@ export const ForgotPasswordPage: React.FC = () => {
             {formError && (
               <Alert
                 variant="destructive"
-                className="border-red-200 bg-red-50/80 dark:bg-red-950/30 rounded-xl"
+                className="border-red-200 bg-red-50/80"
               >
                 <AlertDescription className="text-sm font-medium">
                   {formError}
@@ -177,7 +177,7 @@ export const ForgotPasswordPage: React.FC = () => {
                 {/* Email Field */}
                 <div className="space-y-2.5">
                   <Label htmlFor="email" className="text-sm font-medium">
-                    อีเมล
+                    Email
                   </Label>
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -188,7 +188,7 @@ export const ForgotPasswordPage: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       disabled={isLoading}
-                      className="h-12 pl-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                      className="h-12 pl-12"
                     />
                   </div>
                 </div>
@@ -202,11 +202,11 @@ export const ForgotPasswordPage: React.FC = () => {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      กำลังส่ง...
+                      Sending...
                     </>
                   ) : (
                     <>
-                      ส่งลิงก์รีเซ็ตรหัสผ่าน
+                      Send Reset Link
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </>
                   )}
@@ -215,14 +215,14 @@ export const ForgotPasswordPage: React.FC = () => {
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground text-center">
-                  หากคุณไม่ได้รับอีเมล กรุณาตรวจสอบโฟลเดอร์สแปม หรือลองอีกครั้งในอีกสักครู่
+                  If you don't receive an email, please check your spam folder or try again in a few minutes.
                 </p>
                 
                 {/* Development Only - Show Reset URL */}
                 {resetUrl && (
                   <div className="p-4 rounded-xl bg-muted/50 space-y-2">
                     <p className="text-xs font-medium text-muted-foreground">
-                      สำหรับทดสอบ (Development):
+                      For testing (Development):
                     </p>
                     <div className="flex gap-2">
                       <input
@@ -256,7 +256,7 @@ export const ForgotPasswordPage: React.FC = () => {
                   variant="outline"
                   className="w-full h-12 rounded-xl"
                 >
-                  ส่งอีกครั้ง
+                  Send Again
                 </Button>
               </div>
             )}
@@ -265,10 +265,10 @@ export const ForgotPasswordPage: React.FC = () => {
             <div className="pt-4 border-t border-border/60">
               <Link
                 to="/login"
-                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+                className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-orange-600"
               >
                 <ArrowLeft className="h-4 w-4" />
-                กลับไปหน้าเข้าสู่ระบบ
+                Back to Sign In
               </Link>
             </div>
           </CardContent>
@@ -276,7 +276,7 @@ export const ForgotPasswordPage: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/70 mt-8">
-          © 2026 MoneyMate. ระบบบันทึกรายรับรายจ่ายอัจฉริยะ
+          © 2026 MoneyMate. Smart Income & Expense Tracker
         </p>
       </motion.div>
     </div>
