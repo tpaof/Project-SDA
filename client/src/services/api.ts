@@ -1,4 +1,4 @@
-import axios, { AxiosError, type AxiosRequestConfig } from "axios";
+import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
@@ -15,11 +15,11 @@ const getToken = (): string | null => {
   return localStorage.getItem("token") || sessionStorage.getItem("token");
 };
 
-// Request interceptor - เพิ่ม JWT token
+// Request interceptor - add JWT token
 api.interceptors.request.use(
-  (config: AxiosRequestConfig) => {
+  (config: InternalAxiosRequestConfig) => {
     const token = getToken();
-    if (token && config.headers) {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -29,12 +29,12 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - จัดการ errors
+// Response interceptor - handle errors
 api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      // Token หมดอายุหรือไม่ถูกต้อง
+      // Token expired or invalid
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("remember_me");

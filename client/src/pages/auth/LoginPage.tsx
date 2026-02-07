@@ -23,19 +23,19 @@ export const LoginPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!email.trim()) {
-      setFormError("กรุณากรอกอีเมล");
+      setFormError("Please enter your email");
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("รูปแบบอีเมลไม่ถูกต้อง");
+      setFormError("Invalid email format");
       return false;
     }
     if (!password) {
-      setFormError("กรุณากรอกรหัสผ่าน");
+      setFormError("Please enter your password");
       return false;
     }
     if (password.length < 6) {
-      setFormError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+      setFormError("Password must be at least 6 characters");
       return false;
     }
     return true;
@@ -50,13 +50,13 @@ export const LoginPage: React.FC = () => {
 
     try {
       await login(email, password, rememberMe);
-      toast.success("เข้าสู่ระบบสำเร็จ!", {
-        description: rememberMe ? "จดจำการเข้าสู่ระบบของคุณแล้ว" : "ยินดีต้อนรับกลับมา",
+      toast.success("Welcome back!", {
+        description: rememberMe ? "We'll remember you for next time" : "Successfully signed in to your account",
       });
       navigate("/dashboard");
     } catch {
-      toast.error("เข้าสู่ระบบไม่สำเร็จ", {
-        description: "กรุณาตรวจสอบอีเมลและรหัสผ่าน",
+      toast.error("Sign in failed", {
+        description: "Please check your email and password",
       });
     }
   };
@@ -92,7 +92,7 @@ export const LoginPage: React.FC = () => {
         
         {/* Grid Pattern */}
         <div 
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)`,
             backgroundSize: '60px 60px'
@@ -112,7 +112,7 @@ export const LoginPage: React.FC = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col items-center justify-center mb-8"
+          className="flex items-center justify-center gap-4 mb-8"
         >
           <div className="relative">
             <motion.div 
@@ -120,35 +120,35 @@ export const LoginPage: React.FC = () => {
               transition={{ duration: 2, repeat: Infinity }}
               className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
             />
-            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
-              <Wallet className="h-10 w-10 text-white" />
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-3 rounded-2xl shadow-2xl shadow-orange-500/30">
+              <Wallet className="h-8 w-8 text-white" />
             </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="text-left">
             <h1 className="text-3xl font-bold gradient-text tracking-tight">
               MoneyMate
             </h1>
-            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1 justify-center">
+            <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
               <Sparkles className="h-3 w-3 text-amber-500" />
-              บันทึกรายรับรายจ่ายอัจฉริยะ
+              Smart Income & Expense Tracker
             </p>
           </div>
         </motion.div>
 
-        <Card className="glass shadow-2xl shadow-black/5 border-white/60 dark:border-white/10">
+        <Card className="shadow-2xl border-border/70">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-2xl font-bold text-center pt-2">
-              ยินดีต้อนรับกลับ
+              Welcome Back
             </CardTitle>
             <CardDescription className="text-center text-base">
-              เข้าสู่ระบบเพื่อจัดการการเงินของคุณ
+              Sign in to manage your finances
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-5">
             {/* Error Messages */}
             {(formError || error) && (
-              <Alert variant="destructive" className="border-red-200 bg-red-50/80 dark:bg-red-950/30 rounded-xl">
+              <Alert variant="destructive" className="border-red-200 bg-red-50/80">
                 <AlertDescription className="text-sm font-medium">
                   {formError || error}
                 </AlertDescription>
@@ -159,16 +159,16 @@ export const LoginPage: React.FC = () => {
               {/* Email Field */}
               <div className="space-y-2.5">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  อีเมล
+                  Email
                 </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="h-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                  className="h-12"
                 />
               </div>
 
@@ -176,24 +176,24 @@ export const LoginPage: React.FC = () => {
               <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password" className="text-sm font-medium">
-                    รหัสผ่าน
+                    Password
                   </Label>
                   <Link 
                     to="/forgot-password" 
-                    className="text-xs text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 font-medium transition-colors"
+                    className="text-xs text-orange-600 hover:text-orange-700"
                   >
-                    ลืมรหัสผ่าน?
+                    Forgot password?
                   </Link>
                 </div>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12"
                   />
                   <button
                     type="button"
@@ -214,7 +214,7 @@ export const LoginPage: React.FC = () => {
               <div className="flex items-center justify-between">
                 <Checkbox
                   id="remember"
-                  label="จดจำฉันไว้"
+                  label="Remember me"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
@@ -229,11 +229,11 @@ export const LoginPage: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    กำลังเข้าสู่ระบบ...
+                    Signing in...
                   </>
                 ) : (
                   <>
-                    เข้าสู่ระบบ
+                    Sign In
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </>
                 )}
@@ -246,20 +246,20 @@ export const LoginPage: React.FC = () => {
                 <div className="w-full border-t border-border/60" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background/80 backdrop-blur-sm px-4 text-muted-foreground rounded-full">
-                  หรือ
+                <span className="bg-background px-4 text-muted-foreground rounded-full border border-border/70 shadow-sm">
+                  or
                 </span>
               </div>
             </div>
 
             {/* Register Link */}
             <div className="text-center">
-              <span className="text-muted-foreground">ยังไม่มีบัญชี? </span>
+              <span className="text-muted-foreground">Don't have an account? </span>
               <Link
                 to="/register"
-                className="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors inline-flex items-center gap-1 group"
+                className="font-semibold text-orange-600 hover:text-orange-700"
               >
-                สมัครสมาชิก
+                Sign up
                 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
@@ -268,7 +268,7 @@ export const LoginPage: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/70 mt-8">
-          © 2026 MoneyMate. ระบบบันทึกรายรับรายจ่ายอัจฉริยะ
+          © 2026 MoneyMate. Smart Income & Expense Tracker
         </p>
       </motion.div>
     </div>

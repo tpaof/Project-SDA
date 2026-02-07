@@ -40,10 +40,10 @@ export const RegisterPage: React.FC = () => {
   };
 
   const getStrengthText = () => {
-    if (strengthScore <= 1) return "อ่อน";
-    if (strengthScore <= 2) return "ปานกลาง";
-    if (strengthScore === 3) return "ดี";
-    return "แข็งแรง";
+    if (strengthScore <= 1) return "Weak";
+    if (strengthScore <= 2) return "Fair";
+    if (strengthScore === 3) return "Good";
+    return "Strong";
   };
 
   const getStrengthTextColor = () => {
@@ -55,23 +55,23 @@ export const RegisterPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!email.trim()) {
-      setFormError("กรุณากรอกอีเมล");
+      setFormError("Please enter your email");
       return false;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setFormError("รูปแบบอีเมลไม่ถูกต้อง");
+      setFormError("Invalid email format");
       return false;
     }
     if (!password) {
-      setFormError("กรุณากรอกรหัสผ่าน");
+      setFormError("Please enter your password");
       return false;
     }
     if (password.length < 6) {
-      setFormError("รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร");
+      setFormError("Password must be at least 6 characters");
       return false;
     }
     if (password !== confirmPassword) {
-      setFormError("รหัสผ่านไม่ตรงกัน");
+      setFormError("Passwords do not match");
       return false;
     }
     return true;
@@ -87,15 +87,15 @@ export const RegisterPage: React.FC = () => {
 
     try {
       await register(email, password);
-      toast.success("🎉 สมัครสมาชิกสำเร็จ!", {
-        description: "กำลังนำคุณไปยังแดชบอร์ด...",
+      toast.success("Welcome to MoneyMate! 🎉", {
+        description: "Taking you to the dashboard...",
       });
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
     } catch {
-      toast.error("สมัครสมาชิกไม่สำเร็จ", {
-        description: "กรุณาลองใหม่อีกครั้ง",
+      toast.error("Registration failed", {
+        description: "Please try again",
       });
     }
   };
@@ -121,7 +121,7 @@ export const RegisterPage: React.FC = () => {
         />
         
         <div 
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
             backgroundImage: `linear-gradient(to right, hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--foreground)) 1px, transparent 1px)`,
             backgroundSize: '60px 60px'
@@ -141,7 +141,7 @@ export const RegisterPage: React.FC = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col items-center justify-center mb-6"
+          className="flex items-center justify-center gap-4 mb-6"
         >
           <div className="relative">
             <motion.div 
@@ -149,37 +149,37 @@ export const RegisterPage: React.FC = () => {
               transition={{ duration: 2, repeat: Infinity }}
               className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
             />
-            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
-              <Wallet className="h-10 w-10 text-white" />
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-3 rounded-2xl shadow-2xl shadow-orange-500/30">
+              <Wallet className="h-8 w-8 text-white" />
             </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="text-left">
             <h1 className="text-3xl font-bold gradient-text tracking-tight">
               MoneyMate
             </h1>
-            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1 justify-center">
+            <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
               <Sparkles className="h-3 w-3 text-amber-500" />
-              เริ่มต้นจัดการการเงินที่ดีกว่า
+              Start managing your finances better
             </p>
           </div>
         </motion.div>
 
-        <Card className="glass shadow-2xl shadow-black/5 border-white/60 dark:border-white/10">
+        <Card className="shadow-2xl border-border/70">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-2xl font-bold text-center">
-              สร้างบัญชีใหม่
+              Create Account
             </CardTitle>
             <CardDescription className="text-center text-base">
-              สมัครสมาชิกเพื่อใช้งาน MoneyMate
+              Sign up to use MoneyMate
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-5">
             {/* Success Message */}
             {successMessage && (
-              <Alert className="border-emerald-200 bg-emerald-50/80 dark:bg-emerald-950/30 rounded-xl">
+              <Alert className="border-emerald-200 bg-emerald-50/80">
                 <Check className="h-4 w-4 text-emerald-600" />
-                <AlertDescription className="text-emerald-700 dark:text-emerald-300 font-medium">
+                <AlertDescription className="text-emerald-700">
                   {successMessage}
                 </AlertDescription>
               </Alert>
@@ -187,7 +187,7 @@ export const RegisterPage: React.FC = () => {
 
             {/* Error Messages */}
             {(formError || error) && (
-              <Alert variant="destructive" className="border-rose-200 bg-rose-50/80 dark:bg-rose-950/30 rounded-xl">
+              <Alert variant="destructive" className="border-rose-200 bg-rose-50/80">
                 <X className="h-4 w-4" />
                 <AlertDescription className="text-sm font-medium">
                   {formError || error}
@@ -199,7 +199,7 @@ export const RegisterPage: React.FC = () => {
               {/* Email Field */}
               <div className="space-y-2.5">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  อีเมล
+                  Email
                 </Label>
                 <Input
                   id="email"
@@ -208,7 +208,7 @@ export const RegisterPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="h-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                  className="h-12"
                 />
               </div>
 
@@ -216,17 +216,17 @@ export const RegisterPage: React.FC = () => {
               <div className="space-y-2.5">
                 <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
                   <Lock className="h-3.5 w-3.5" />
-                  รหัสผ่าน
+                  Password
                 </Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Create a password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12"
                   />
                   <button
                     type="button"
@@ -242,7 +242,7 @@ export const RegisterPage: React.FC = () => {
                 {password && (
                   <div className="space-y-3 p-4 rounded-xl bg-muted/50">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">ความปลอดภัย:</span>
+                      <span className="text-xs text-muted-foreground">Security:</span>
                       <span className={`text-xs font-semibold ${getStrengthTextColor()}`}>
                         {getStrengthText()}
                       </span>
@@ -252,7 +252,7 @@ export const RegisterPage: React.FC = () => {
                         <div
                           key={i}
                           className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                            i <= strengthScore ? getStrengthColor() : "bg-gray-200 dark:bg-gray-700"
+                            i <= strengthScore ? getStrengthColor() : "bg-gray-200"
                           }`}
                         />
                       ))}
@@ -260,19 +260,19 @@ export const RegisterPage: React.FC = () => {
                     <ul className="space-y-1.5 text-xs">
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.minLength ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.minLength ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-current" />}
-                        อย่างน้อย 6 ตัวอักษร
+                        At least 6 characters
                       </li>
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.hasLetter ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.hasLetter ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-current" />}
-                        มีตัวอักษร a-z
+                        Contains letters a-z
                       </li>
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.hasNumber ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.hasNumber ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-current" />}
-                        มีตัวเลข 0-9
+                        Contains numbers 0-9
                       </li>
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.hasSpecial ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.hasSpecial ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-current" />}
-                        มีอักขระพิเศษ (!@#$%)
+                        Contains special characters (!@#$%)
                       </li>
                     </ul>
                   </div>
@@ -282,17 +282,17 @@ export const RegisterPage: React.FC = () => {
               {/* Confirm Password Field */}
               <div className="space-y-2.5">
                 <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                  ยืนยันรหัสผ่าน
+                  Confirm Password
                 </Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Confirm your password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12"
                   />
                   <button
                     type="button"
@@ -306,13 +306,13 @@ export const RegisterPage: React.FC = () => {
                 {confirmPassword && password !== confirmPassword && (
                   <p className="text-xs text-rose-500 flex items-center gap-1">
                     <X className="h-3 w-3" />
-                    รหัสผ่านไม่ตรงกัน
+                    Passwords do not match
                   </p>
                 )}
                 {confirmPassword && password === confirmPassword && password.length > 0 && (
                   <p className="text-xs text-emerald-600 flex items-center gap-1">
                     <Check className="h-3 w-3" />
-                    รหัสผ่านตรงกัน
+                    Passwords match
                   </p>
                 )}
               </div>
@@ -326,11 +326,11 @@ export const RegisterPage: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    กำลังสมัครสมาชิก...
+                    Creating account...
                   </>
                 ) : (
                   <>
-                    สมัครสมาชิก
+                    Sign Up
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </>
                 )}
@@ -343,20 +343,20 @@ export const RegisterPage: React.FC = () => {
                 <div className="w-full border-t border-border/60" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background/80 backdrop-blur-sm px-4 text-muted-foreground rounded-full">
-                  หรือ
+                <span className="bg-background px-4 text-muted-foreground rounded-full border border-border/70 shadow-sm">
+                  or
                 </span>
               </div>
             </div>
 
             {/* Login Link */}
             <div className="text-center">
-              <span className="text-muted-foreground">มีบัญชีอยู่แล้ว? </span>
+              <span className="text-muted-foreground">Already have an account? </span>
               <Link
                 to="/login"
-                className="font-semibold text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300 transition-colors inline-flex items-center gap-1 group"
+                className="font-semibold text-orange-600 hover:text-orange-700"
               >
-                เข้าสู่ระบบ
+                Sign in
                 <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
@@ -365,7 +365,7 @@ export const RegisterPage: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/70 mt-8">
-          © 2026 MoneyMate. ระบบบันทึกรายรับรายจ่ายอัจฉริยะ
+          © 2026 MoneyMate. Smart Income & Expense Tracker
         </p>
       </motion.div>
     </div>

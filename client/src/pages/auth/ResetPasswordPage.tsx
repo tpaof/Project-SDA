@@ -66,15 +66,15 @@ export const ResetPasswordPage: React.FC = () => {
 
   const validateForm = (): boolean => {
     if (!password) {
-      setFormError("กรุณากรอกรหัสผ่าน");
+      setFormError("Please enter a password");
       return false;
     }
     if (password.length < 8) {
-      setFormError("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+      setFormError("Password must be at least 8 characters");
       return false;
     }
     if (password !== confirmPassword) {
-      setFormError("รหัสผ่านไม่ตรงกัน");
+      setFormError("Passwords do not match");
       return false;
     }
     return true;
@@ -91,8 +91,8 @@ export const ResetPasswordPage: React.FC = () => {
     try {
       await authService.resetPassword({ token, password });
       setIsSuccess(true);
-      toast.success("รีเซ็ตรหัสผ่านสำเร็จ", {
-        description: "กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่",
+      toast.success("Password updated", {
+        description: "Your password has been reset successfully",
       });
       
       // Redirect to login after 3 seconds
@@ -100,9 +100,9 @@ export const ResetPasswordPage: React.FC = () => {
         navigate("/login");
       }, 3000);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+      const message = error instanceof Error ? error.message : "An error occurred. Please try again.";
       setFormError(message);
-      toast.error("ไม่สามารถรีเซ็ตรหัสผ่านได้", {
+      toast.error("Could not reset password", {
         description: message,
       });
     } finally {
@@ -119,7 +119,7 @@ export const ResetPasswordPage: React.FC = () => {
           className="flex flex-col items-center gap-4"
         >
           <Loader2 className="h-8 w-8 animate-spin text-orange-500" />
-          <p className="text-muted-foreground">กำลังตรวจสอบลิงก์...</p>
+          <p className="text-muted-foreground">Verifying link...</p>
         </motion.div>
       </div>
     );
@@ -133,22 +133,22 @@ export const ResetPasswordPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative z-10 w-full max-w-md"
         >
-          <Card className="glass shadow-2xl border-white/60 dark:border-white/10">
+          <Card className="shadow-2xl border-border/70">
             <CardContent className="pt-8 pb-8 text-center space-y-4">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900/30 mx-auto">
-                <XCircle className="h-8 w-8 text-rose-600 dark:text-rose-400" />
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-rose-100">
+                <XCircle className="h-8 w-8 text-rose-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold mb-2">ลิงก์ไม่ถูกต้องหรือหมดอายุ</h2>
+                <h2 className="text-xl font-bold mb-2">Invalid or Expired Link</h2>
                 <p className="text-muted-foreground text-sm">
-                  ลิงก์รีเซ็ตรหัสผ่านนี้ไม่ถูกต้องหรืออาจหมดอายุแล้ว กรุณาขอลิงก์ใหม่
+                  This password reset link is invalid or has expired. Please request a new one.
                 </p>
               </div>
               <Link
                 to="/forgot-password"
                 className="inline-flex items-center justify-center w-full h-11 rounded-xl btn-gradient text-white border-0 font-medium text-sm"
               >
-                ขอลิงก์ใหม่
+                Request New Link
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </CardContent>
@@ -166,22 +166,22 @@ export const ResetPasswordPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="relative z-10 w-full max-w-md"
         >
-          <Card className="glass shadow-2xl border-white/60 dark:border-white/10">
+          <Card className="shadow-2xl border-border/70">
             <CardContent className="pt-8 pb-8 text-center space-y-4">
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 mx-auto">
-                <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100">
+                <CheckCircle2 className="h-8 w-8 text-emerald-600" />
               </div>
               <div>
-                <h2 className="text-xl font-bold mb-2">รีเซ็ตรหัสผ่านสำเร็จ!</h2>
+                <h2 className="text-xl font-bold mb-2">Password Reset Successful!</h2>
                 <p className="text-muted-foreground text-sm">
-                  รหัสผ่านของคุณถูกเปลี่ยนเรียบร้อยแล้ว กำลังนำคุณไปยังหน้าเข้าสู่ระบบ...
+                  Your password has been changed successfully. Taking you to the sign in page...
                 </p>
               </div>
               <Link
                 to="/login"
                 className="inline-flex items-center justify-center w-full h-11 rounded-xl btn-gradient text-white border-0 font-medium text-sm"
               >
-                เข้าสู่ระบบ
+                Sign In
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </CardContent>
@@ -219,35 +219,35 @@ export const ResetPasswordPage: React.FC = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex flex-col items-center justify-center mb-8"
+          className="flex items-center justify-center gap-4 mb-8"
         >
           <div className="relative">
             <div className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50" />
-            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-4 rounded-2xl shadow-2xl shadow-orange-500/30">
-              <Wallet className="h-10 w-10 text-white" />
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-3 rounded-2xl shadow-2xl shadow-orange-500/30">
+              <Wallet className="h-8 w-8 text-white" />
             </div>
           </div>
-          <div className="mt-4 text-center">
+          <div className="text-left">
             <h1 className="text-3xl font-bold gradient-text tracking-tight">
               MoneyMate
             </h1>
           </div>
         </motion.div>
 
-        <Card className="glass shadow-2xl shadow-black/5 border-white/60 dark:border-white/10">
+        <Card className="shadow-2xl border-border/70">
           <CardHeader className="space-y-2 pb-6">
             <CardTitle className="text-2xl font-bold text-center pt-2">
-              ตั้งรหัสผ่านใหม่
+              Set New Password
             </CardTitle>
             <CardDescription className="text-center text-base">
-              สำหรับบัญชี {email}
+              For account {email}
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-5">
             {/* Error Messages */}
             {formError && (
-              <Alert variant="destructive" className="border-rose-200 bg-rose-50/80 dark:bg-rose-950/30 rounded-xl">
+              <Alert variant="destructive" className="border-rose-200 bg-rose-50/80">
                 <AlertDescription className="text-sm font-medium">
                   {formError}
                 </AlertDescription>
@@ -259,17 +259,17 @@ export const ResetPasswordPage: React.FC = () => {
               <div className="space-y-2.5">
                 <Label htmlFor="password" className="text-sm font-medium flex items-center gap-2">
                   <Lock className="h-3.5 w-3.5" />
-                  รหัสผ่านใหม่
+                  New Password
                 </Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Enter new password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12"
                   />
                   <button
                     type="button"
@@ -289,7 +289,7 @@ export const ResetPasswordPage: React.FC = () => {
                         <div
                           key={i}
                           className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-                            i <= strengthScore ? getStrengthColor() : "bg-gray-200 dark:bg-gray-700"
+                            i <= strengthScore ? getStrengthColor() : "bg-gray-200"
                           }`}
                         />
                       ))}
@@ -297,19 +297,19 @@ export const ResetPasswordPage: React.FC = () => {
                     <ul className="space-y-1.5 text-xs">
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.minLength ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.minLength ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        อย่างน้อย 8 ตัวอักษร
+                        At least 8 characters
                       </li>
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.hasLetter ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.hasLetter ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        มีตัวอักษร a-z
+                        Contains letters a-z
                       </li>
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.hasNumber ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.hasNumber ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        มีตัวเลข 0-9
+                        Contains numbers 0-9
                       </li>
                       <li className={`flex items-center gap-2 transition-colors ${passwordStrength.hasSpecial ? "text-emerald-600" : "text-muted-foreground"}`}>
                         {passwordStrength.hasSpecial ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                        มีอักขระพิเศษ
+                        Contains special characters
                       </li>
                     </ul>
                   </div>
@@ -319,17 +319,17 @@ export const ResetPasswordPage: React.FC = () => {
               {/* Confirm Password Field */}
               <div className="space-y-2.5">
                 <Label htmlFor="confirmPassword" className="text-sm font-medium">
-                  ยืนยันรหัสผ่าน
+                  Confirm Password
                 </Label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Confirm new password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12 rounded-xl border-2 bg-white/70 backdrop-blur-sm transition-all duration-300 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10"
+                    className="h-12 pr-12"
                   />
                   <button
                     type="button"
@@ -343,7 +343,7 @@ export const ResetPasswordPage: React.FC = () => {
                 {confirmPassword && password !== confirmPassword && (
                   <p className="text-xs text-rose-500 flex items-center gap-1">
                     <X className="h-3 w-3" />
-                    รหัสผ่านไม่ตรงกัน
+                    Passwords do not match
                   </p>
                 )}
               </div>
@@ -357,11 +357,11 @@ export const ResetPasswordPage: React.FC = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    กำลังบันทึก...
+                    Saving...
                   </>
                 ) : (
                   <>
-                    ตั้งรหัสผ่านใหม่
+                    Set New Password
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </>
                 )}
@@ -372,7 +372,7 @@ export const ResetPasswordPage: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-xs text-muted-foreground/70 mt-8">
-          © 2026 MoneyMate. ระบบบันทึกรายรับรายจ่ายอัจฉริยะ
+          © 2026 MoneyMate. Smart Income & Expense Tracker
         </p>
       </motion.div>
     </div>

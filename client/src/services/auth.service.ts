@@ -63,7 +63,7 @@ export const authService = {
   },
 
   async verifyToken(): Promise<AuthResponse["user"]> {
-    const response = await api.get<AuthResponse["user"]>>("/auth/me");
+    const response = await api.get<AuthResponse["user"]>("/auth/me");
     return response.data;
   },
 
@@ -80,12 +80,12 @@ export const authService = {
   },
 
   getStoredAuth(): { token: string | null; user: AuthResponse["user"] | null; rememberMe: boolean } {
-    // ตรวจสอบ localStorage ก่อน (remember me)
+    // Check localStorage first (remember me)
     let token = localStorage.getItem(TOKEN_KEY);
     let userStr = localStorage.getItem(USER_KEY);
     let rememberMe = localStorage.getItem(REMEMBER_KEY) === "true";
 
-    // ถ้าไม่มีใน localStorage ให้ตรวจสอบ sessionStorage
+    // If not in localStorage, check sessionStorage
     if (!token) {
       token = sessionStorage.getItem(TOKEN_KEY);
       userStr = sessionStorage.getItem(USER_KEY);
@@ -97,14 +97,16 @@ export const authService = {
   },
 
   setStoredAuth(token: string, user: AuthResponse["user"], rememberMe: boolean = false): void {
-    const storage = this.getStorage(rememberMe);
-    
-    storage.setItem(TOKEN_KEY, token);
-    storage.setItem(USER_KEY, JSON.stringify(user));
-    
     if (rememberMe) {
+      // Store in localStorage for persistent session
+      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
       localStorage.setItem(REMEMBER_KEY, "true");
     } else {
+      // Store in sessionStorage for session-only
+      // Note: sessionStorage persists on refresh but clears on tab close
+      sessionStorage.setItem(TOKEN_KEY, token);
+      sessionStorage.setItem(USER_KEY, JSON.stringify(user));
       localStorage.removeItem(REMEMBER_KEY);
     }
   },
