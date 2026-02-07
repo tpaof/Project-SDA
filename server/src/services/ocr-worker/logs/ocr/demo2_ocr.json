@@ -470,7 +470,6 @@
     ]
   },
   "parsed": {
-    "transaction_type": "transfer",
     "payer": "นายกรวิชญ์ค",
     "payee": "นาง บุบผา บุญรัตน์",
     "amount": "4d.00",
