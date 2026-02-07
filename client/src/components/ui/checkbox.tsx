@@ -5,10 +5,16 @@ import { Check } from "lucide-react";
 export interface CheckboxProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ className, label, ...props }, ref) => {
+  ({ className, label, onCheckedChange, onChange, ...props }, ref) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange?.(e);
+      onCheckedChange?.(e.target.checked);
+    };
+
     return (
       <label className="flex items-center gap-3 cursor-pointer group">
         <div className="relative">
@@ -16,14 +22,15 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             type="checkbox"
             ref={ref}
             className="peer sr-only"
+            onChange={handleChange}
             {...props}
           />
           <div
             className={cn(
-              "h-5 w-5 rounded-md border-2 border-muted-foreground/30 bg-white/70 dark:bg-gray-900/50",
+              "h-5 w-5 rounded-md border-2 border-muted-foreground/30 bg-background",
               "transition-all duration-200",
               "peer-focus-visible:ring-2 peer-focus-visible:ring-orange-400 peer-focus-visible:ring-offset-2",
-              "peer-checked:border-orange-500 peer-checked:bg-gradient-to-br peer-checked:from-amber-400 peer-checked:to-orange-500",
+              "peer-checked:border-orange-500 peer-checked:bg-linear-to-br peer-checked:from-amber-400 peer-checked:to-orange-500",
               "group-hover:border-orange-400/50",
               className
             )}
