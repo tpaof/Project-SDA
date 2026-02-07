@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or serverless functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  passwordResetTokens PasswordResetToken[]
+  transactions        Transaction[]
+  slips               Slip[]
+
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [email], references: [email], onDelete: Cascade)
+
+  @@index([email])
+  @@index([token])
+  @@map("password_reset_tokens")
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  type        String // income | expense
+  amount      Float
+  description String?
+  category    String?
+  date        DateTime
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  slipId      String?
+  slip        Slip?    @relation(fields: [slipId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@map("transactions")
+}
+
+model Slip {
+  id           String        @id @default(uuid())
+  filename     String
+  originalName String
+  status       String // pending | processing | completed | failed
+  ocrResult    Json?
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+  processedAt  DateTime?
+
+  @@map("slips")
+}

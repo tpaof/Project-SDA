@@ -67,10 +67,10 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 
 - **Node.js** >= 18.0.0
 - **pnpm** >= 8.0.0
-- **Docker** (optional, for containerized development)
-- **Python** >= 3.9 (for OCR worker)
+- **Docker** & **Docker Compose** (required for PostgreSQL database)
+- **Python** >= 3.9 (for OCR worker, optional)
 
-### Initial Setup
+### Quick Start
 
 ```bash
 # Clone repository
@@ -80,10 +80,14 @@ cd MoneyMate
 # Install all dependencies (monorepo)
 pnpm install
 
-# Setup environment variables
-cp server/.env.example server/.env
-# Edit server/.env with your configuration
+# Start everything with a single command!
+# (starts PostgreSQL, runs migrations, starts client & server)
+pnpm dev
 ```
+
+> [!NOTE]
+> Docker must be running before executing `pnpm dev`.
+> The first run will pull the PostgreSQL image which may take a moment.
 
 ---
 
@@ -98,20 +102,25 @@ cp server/.env.example server/.env
 | 🔴 **Redis**            | localhost:6379        | Cache & Message Queue    |
 | 🐍 **OCR Worker**       | http://localhost:5000 | Python Flask OCR Service |
 
-### Start Development
+### Development Commands
 
-```bash
-# Start all services (client + server)
-pnpm dev
+| Command           | Description                                                 |
+| ----------------- | ----------------------------------------------------------- |
+| `pnpm dev`        | 🚀 **Start everything** (DB + migrations + client + server) |
+| `pnpm dev:all`    | Start client & server only (assumes DB is running)          |
+| `pnpm dev:client` | Start only client                                           |
+| `pnpm dev:server` | Start only server                                           |
 
-# Start only client
-pnpm dev:client
+### Database Commands
 
-# Start only server
-pnpm dev:server
-```
+| Command           | Description                |
+| ----------------- | -------------------------- |
+| `pnpm db:up`      | Start PostgreSQL container |
+| `pnpm db:down`    | Stop PostgreSQL container  |
+| `pnpm db:migrate` | Run Prisma migrations      |
+| `pnpm db:studio`  | Open Prisma Studio GUI     |
 
-### Build for Production
+### Build & Maintenance
 
 ```bash
 # Build all packages
@@ -176,8 +185,8 @@ JWT_EXPIRES_IN=7d
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# Database (PostgreSQL)
-DATABASE_URL=postgresql://user:password@localhost:5432/moneymate
+# Database (PostgreSQL) - matches docker-compose.yml defaults
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/moneymate
 
 # File Upload
 UPLOAD_DIR=./uploads

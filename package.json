@@ -4,9 +4,14 @@
   "private": true,
   "description": "MoneyMate - Income/Expense tracking with OCR slip upload",
   "scripts": {
-    "dev": "pnpm -r --parallel run dev",
+    "dev": "pnpm run db:up && pnpm run db:migrate && pnpm run dev:all",
+    "dev:all": "pnpm -r --parallel run dev",
     "dev:client": "pnpm --filter client run dev",
     "dev:server": "pnpm --filter server run dev",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter server run db:migrate",
+    "db:studio": "pnpm --filter server run db:studio",
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
     "clean": "pnpm -r exec rm -rf node_modules dist .turbo"
