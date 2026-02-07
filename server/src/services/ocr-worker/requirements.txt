@@ -1,9 +1,9 @@
-opencv-python
-pytesseract
-Pillow
-redis
-numpy
-python-dotenv
-flask
-opencv-python
-requests
+Pillow          # image I/O
+redis           # queue
+numpy           # image array
+python-dotenv   # env config
+flask           # health + callback
+requests        # callback POST
+easyocr         # OCR engine
+torch           # backend ของ easyocr
+torchvision     # dependency ของ torch

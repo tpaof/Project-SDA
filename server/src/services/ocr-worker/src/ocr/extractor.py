@@ -1,40 +1,42 @@
-import pytesseract
-from pytesseract import Output
-from config import TESSERACT_CMD
+import easyocr
+import numpy as np
 
-pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
+# init reader ครั้งเดียว (สำคัญมาก)
+reader = easyocr.Reader(
+    ['th', 'en'],
+    gpu=False
+)
 
 def extract_text_with_log(image):
-    data = pytesseract.image_to_data(
-        image,
-        lang="tha+eng",
-        config="--psm 6",
-        output_type=Output.DICT
-    )
+    """
+    OCR ด้วย EasyOCR
+    คืน text + confidence + bbox
+    """
+
+    results = reader.readtext(image)
 
     words = []
     confidences = []
+    texts = []
 
-    for text, conf in zip(data["text"], data["conf"]):
-        if text.strip() == "":
+    for bbox, text, conf in results:
+        if not text.strip():
             continue
-        try:
-            conf_int = int(conf)
-            if conf_int >= 0:
-                words.append({
-                    "text": text,
-                    "confidence": conf_int
-                })
-                confidences.append(conf_int)
-        except ValueError:
-            continue
+
+        word = {
+            "text": text.strip(),
+            "confidence": round(conf * 100, 2),
+            "bbox": bbox  # <<<<<< สำคัญที่สุด
+        }
+
+        words.append(word)
+        confidences.append(word["confidence"])
+        texts.append(word["text"])
 
     avg_conf = sum(confidences) / len(confidences) if confidences else 0
 
-    full_text = " ".join([w["text"] for w in words])
-
     return {
-        "raw_text": full_text,
+        "raw_text": " ".join(texts),
         "confidence_avg": round(avg_conf, 2),
         "words": words
     }

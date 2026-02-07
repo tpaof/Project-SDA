@@ -1,7 +1,607 @@
 {
   "job_id": "demo1",
-  "status": "failed",
-  "error": "job payload ไม่ครบ (job_id / image_path / callback_url)",
-  "traceback": "Traceback (most recent call last):\n  File \"/app/src/queue/consumer.py\", line 59, in start_consumer\n    raise ValueError(\"job payload ไม่ครบ (job_id / image_path / callback_url)\")\nValueError: job payload ไม่ครบ (job_id / image_path / callback_url)\n",
-  "timestamp": "2026-02-05T15:43:59.405647"
+  "image_path": "/data/slip_demo.jpg",
+  "ocr": {
+    "raw_text": "ร ห ั ส อ ้ า ง อ ิ ง Re (20260205603618310947 [ต ไส 2 ชร ๑ น า ย ก ร ว ิ ช ญ ์ ค *** ก ร ุ ง ไท ย : ว )00(-%-%2543-2 v ¥ ร ้ า น ถุ ง เง ิ น (ว ร า ท ิ พ ย ์ พ ั ชร ส ิ ท ธิ ์ ว ร า ns) (010753700088205) ร ห ั ส ร ้ า น ค ้ า 163800705703414281 2 ร ห ั ส ธุ ร ก ร ร ม ถุ ง เง ิ น TUNGNGERN จ ํ า น ว น เง ิ น 60.00 บ า ท ค ่ า ธร ร ม เน ี ย ม 0.00 บ า ท ว ั น ท ี ่ ท ํ า ร า ย ก า ร 05 nw. 2569 - 18:25",
+    "confidence_avg": 89.5,
+    "words": [
+      {
+        "text": "ร",
+        "confidence": 96
+      },
+      {
+        "text": "ห",
+        "confidence": 93
+      },
+      {
+        "text": "ั",
+        "confidence": 91
+      },
+      {
+        "text": "ส",
+        "confidence": 96
+      },
+      {
+        "text": "อ",
+        "confidence": 89
+      },
+      {
+        "text": "้",
+        "confidence": 92
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ง",
+        "confidence": 97
+      },
+      {
+        "text": "อ",
+        "confidence": 85
+      },
+      {
+        "text": "ิ",
+        "confidence": 93
+      },
+      {
+        "text": "ง",
+        "confidence": 96
+      },
+      {
+        "text": "Re",
+        "confidence": 10
+      },
+      {
+        "text": "(20260205603618310947",
+        "confidence": 61
+      },
+      {
+        "text": "[ต",
+        "confidence": 58
+      },
+      {
+        "text": "ไส",
+        "confidence": 52
+      },
+      {
+        "text": "2",
+        "confidence": 53
+      },
+      {
+        "text": "ชร",
+        "confidence": 17
+      },
+      {
+        "text": "๑",
+        "confidence": 80
+      },
+      {
+        "text": "น",
+        "confidence": 56
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ย",
+        "confidence": 96
+      },
+      {
+        "text": "ก",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 97
+      },
+      {
+        "text": "ว",
+        "confidence": 93
+      },
+      {
+        "text": "ิ",
+        "confidence": 92
+      },
+      {
+        "text": "ช",
+        "confidence": 92
+      },
+      {
+        "text": "ญ",
+        "confidence": 93
+      },
+      {
+        "text": "์",
+        "confidence": 91
+      },
+      {
+        "text": "ค",
+        "confidence": 92
+      },
+      {
+        "text": "***",
+        "confidence": 56
+      },
+      {
+        "text": "ก",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 93
+      },
+      {
+        "text": "ุ",
+        "confidence": 93
+      },
+      {
+        "text": "ง",
+        "confidence": 96
+      },
+      {
+        "text": "ไท",
+        "confidence": 96
+      },
+      {
+        "text": "ย",
+        "confidence": 96
+      },
+      {
+        "text": ":",
+        "confidence": 79
+      },
+      {
+        "text": "ว",
+        "confidence": 79
+      },
+      {
+        "text": ")00(-%-%2543-2",
+        "confidence": 0
+      },
+      {
+        "text": "v",
+        "confidence": 80
+      },
+      {
+        "text": "¥",
+        "confidence": 73
+      },
+      {
+        "text": "ร",
+        "confidence": 93
+      },
+      {
+        "text": "้",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 96
+      },
+      {
+        "text": "ถุ",
+        "confidence": 96
+      },
+      {
+        "text": "ง",
+        "confidence": 96
+      },
+      {
+        "text": "เง",
+        "confidence": 93
+      },
+      {
+        "text": "ิ",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 96
+      },
+      {
+        "text": "(ว",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ท",
+        "confidence": 87
+      },
+      {
+        "text": "ิ",
+        "confidence": 93
+      },
+      {
+        "text": "พ",
+        "confidence": 96
+      },
+      {
+        "text": "ย",
+        "confidence": 93
+      },
+      {
+        "text": "์",
+        "confidence": 92
+      },
+      {
+        "text": "พ",
+        "confidence": 91
+      },
+      {
+        "text": "ั",
+        "confidence": 93
+      },
+      {
+        "text": "ชร",
+        "confidence": 96
+      },
+      {
+        "text": "ส",
+        "confidence": 93
+      },
+      {
+        "text": "ิ",
+        "confidence": 93
+      },
+      {
+        "text": "ท",
+        "confidence": 97
+      },
+      {
+        "text": "ธิ",
+        "confidence": 93
+      },
+      {
+        "text": "์",
+        "confidence": 93
+      },
+      {
+        "text": "ว",
+        "confidence": 97
+      },
+      {
+        "text": "ร",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ns)",
+        "confidence": 96
+      },
+      {
+        "text": "(010753700088205)",
+        "confidence": 87
+      },
+      {
+        "text": "ร",
+        "confidence": 96
+      },
+      {
+        "text": "ห",
+        "confidence": 93
+      },
+      {
+        "text": "ั",
+        "confidence": 93
+      },
+      {
+        "text": "ส",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 93
+      },
+      {
+        "text": "้",
+        "confidence": 91
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 96
+      },
+      {
+        "text": "ค",
+        "confidence": 90
+      },
+      {
+        "text": "้",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 92
+      },
+      {
+        "text": "163800705703414281",
+        "confidence": 90
+      },
+      {
+        "text": "2",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 86
+      },
+      {
+        "text": "ห",
+        "confidence": 93
+      },
+      {
+        "text": "ั",
+        "confidence": 93
+      },
+      {
+        "text": "ส",
+        "confidence": 95
+      },
+      {
+        "text": "ธุ",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 96
+      },
+      {
+        "text": "ก",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 97
+      },
+      {
+        "text": "ร",
+        "confidence": 96
+      },
+      {
+        "text": "ม",
+        "confidence": 96
+      },
+      {
+        "text": "ถุ",
+        "confidence": 94
+      },
+      {
+        "text": "ง",
+        "confidence": 96
+      },
+      {
+        "text": "เง",
+        "confidence": 93
+      },
+      {
+        "text": "ิ",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 95
+      },
+      {
+        "text": "TUNGNGERN",
+        "confidence": 92
+      },
+      {
+        "text": "จ",
+        "confidence": 93
+      },
+      {
+        "text": "ํ",
+        "confidence": 92
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 96
+      },
+      {
+        "text": "ว",
+        "confidence": 96
+      },
+      {
+        "text": "น",
+        "confidence": 97
+      },
+      {
+        "text": "เง",
+        "confidence": 93
+      },
+      {
+        "text": "ิ",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 95
+      },
+      {
+        "text": "60.00",
+        "confidence": 92
+      },
+      {
+        "text": "บ",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ท",
+        "confidence": 96
+      },
+      {
+        "text": "ค",
+        "confidence": 93
+      },
+      {
+        "text": "่",
+        "confidence": 66
+      },
+      {
+        "text": "า",
+        "confidence": 92
+      },
+      {
+        "text": "ธร",
+        "confidence": 96
+      },
+      {
+        "text": "ร",
+        "confidence": 96
+      },
+      {
+        "text": "ม",
+        "confidence": 97
+      },
+      {
+        "text": "เน",
+        "confidence": 92
+      },
+      {
+        "text": "ี",
+        "confidence": 93
+      },
+      {
+        "text": "ย",
+        "confidence": 96
+      },
+      {
+        "text": "ม",
+        "confidence": 96
+      },
+      {
+        "text": "0.00",
+        "confidence": 92
+      },
+      {
+        "text": "บ",
+        "confidence": 92
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ท",
+        "confidence": 96
+      },
+      {
+        "text": "ว",
+        "confidence": 93
+      },
+      {
+        "text": "ั",
+        "confidence": 93
+      },
+      {
+        "text": "น",
+        "confidence": 97
+      },
+      {
+        "text": "ท",
+        "confidence": 93
+      },
+      {
+        "text": "ี",
+        "confidence": 93
+      },
+      {
+        "text": "่",
+        "confidence": 92
+      },
+      {
+        "text": "ท",
+        "confidence": 93
+      },
+      {
+        "text": "ํ",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ร",
+        "confidence": 93
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ย",
+        "confidence": 96
+      },
+      {
+        "text": "ก",
+        "confidence": 92
+      },
+      {
+        "text": "า",
+        "confidence": 93
+      },
+      {
+        "text": "ร",
+        "confidence": 96
+      },
+      {
+        "text": "05",
+        "confidence": 93
+      },
+      {
+        "text": "nw.",
+        "confidence": 61
+      },
+      {
+        "text": "2569",
+        "confidence": 93
+      },
+      {
+        "text": "-",
+        "confidence": 92
+      },
+      {
+        "text": "18:25",
+        "confidence": 96
+      }
+    ]
+  },
+  "parsed": {
+    "amount": "60.00",
+    "date": null,
+    "time": "18:25",
+    "transaction_type": null,
+    "bank": null,
+    "reference": "20260205603618310947"
+  },
+  "timestamp": "2026-02-06T08:11:42.849319"
 }

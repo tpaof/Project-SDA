@@ -7,8 +7,6 @@ FROM python:3.10-slim
 # System dependencies
 # -------------------------
 RUN apt-get update && apt-get install -y \
-    tesseract-ocr \
-    tesseract-ocr-tha \
     libgl1 \
     libglib2.0-0 \
     curl \
@@ -23,7 +21,7 @@ WORKDIR /app
 # Python dependencies
 # -------------------------
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=300 -r requirements.txt
 
 # -------------------------
 # Copy source code
@@ -35,10 +33,10 @@ COPY . .
 # -------------------------
 ENV REDIS_HOST=localhost \
     REDIS_PORT=6379 \
-    REDIS_CHANNEL=ocr:jobs
+    REDIS_CHANNEL=ocr:jobs \
+    PYTHONUNBUFFERED=1
 
-ENV PYTHONUNBUFFERED=1
-ENV TESSERACT_CMD=/usr/bin/tesseract
+
 
 # -------------------------
 # Expose health port
@@ -46,7 +44,7 @@ ENV TESSERACT_CMD=/usr/bin/tesseract
 EXPOSE 8080
 
 # -------------------------
-# Healthcheck (optional แต่แนะนำมาก)
+# Healthcheck
 # -------------------------
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:8080/health || exit 1
