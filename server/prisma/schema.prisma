@@ -1,75 +1,70 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or serverless functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client-js" // Generates Prisma Client for TypeScript/JavaScript
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "postgresql" // Use PostgreSQL as the database
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(cuid()) // Primary key, auto-generated unique user ID
+  email     String   @unique              // User email, must be unique
+  password  String                       // Hashed user password
+  createdAt DateTime @default(now()) @map("created_at") // Timestamp when user was created
+  updatedAt DateTime @updatedAt @map("updated_at")     // Auto-updated timestamp on every update
 
   // Relations
-  passwordResetTokens PasswordResetToken[]
-  transactions        Transaction[]
-  slips               Slip[]
+  passwordResetTokens PasswordResetToken[] // One-to-many: user can have many reset tokens
+  transactions        Transaction[]        // One-to-many: user can have many transactions
+  slips               Slip[]               // One-to-many: user can upload many slips
 
-  @@map("users")
+  @@map("users") // Map Prisma model to "users" table in DB
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expiresAt DateTime @map("expires_at")
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
+  id        String   @id @default(cuid()) // Primary key for reset token
+  email     String                       // Email this reset token belongs to
+  token     String   @unique              // Unique reset token string
+  expiresAt DateTime @map("expires_at")   // Expiration datetime for the token
+  used      Boolean  @default(false)       // Whether this token has already been used
+  createdAt DateTime @default(now()) @map("created_at") // When the token was created
 
   // Relations
   user User? @relation(fields: [email], references: [email], onDelete: Cascade)
+  // Optional relation to User via email; deletes token if user is deleted
 
-  @@index([email])
-  @@index([token])
-  @@map("password_reset_tokens")
+  @@index([email]) // Index for faster lookup by email
+  @@index([token]) // Index for faster lookup by token
+  @@map("password_reset_tokens") // Map to DB table name
 }
 
 model Transaction {
-  id          String   @id @default(uuid())
-  type        String // income | expense
-  amount      Float
-  description String?
-  category    String?
-  date        DateTime
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  slipId      String?
-  slip        Slip?    @relation(fields: [slipId], references: [id])
-  createdAt   DateTime @default(now())
+  id          String   @id @default(uuid()) // Primary key, UUID
+  type        String                       // Transaction type: "income" or "expense"
+  amount      Float                        // Transaction amount
+  description String?                      // Optional description
+  category    String?                      // Optional category (e.g., food, travel)
+  date        DateTime                     // Date of the transaction
+  userId      String                       // Foreign key referencing User.id
+  user        User     @relation(fields: [userId], references: [id]) // Many-to-one relation to User
+  slipId      String?                      // Optional foreign key referencing Slip.id
+  slip        Slip?    @relation(fields: [slipId], references: [id]) // Optional relation to Slip
+  createdAt   DateTime @default(now())     // When the transaction record was created
 
-  @@map("transactions")
+  @@map("transactions") // Map to DB table name
 }
 
 model Slip {
-  id           String        @id @default(uuid())
-  filename     String
-  originalName String
-  status       String // pending | processing | completed | failed
-  ocrResult    Json?
-  userId       String
-  user         User          @relation(fields: [userId], references: [id])
-  transactions Transaction[]
-  createdAt    DateTime      @default(now())
-  processedAt  DateTime?
+  id           String        @id @default(uuid()) // Primary key, UUID
+  filename     String                       // Stored filename on disk/cloud
+  originalName String                       // Original uploaded filename from user
+  status       String                       // Processing status: pending | processing | completed | failed
+  ocrResult    Json?                        // OCR result stored as JSON (nullable)
+  userId       String                       // Foreign key referencing User.id
+  user         User          @relation(fields: [userId], references: [id]) // Many-to-one relation to User
+  transactions Transaction[]               // One-to-many: slip can link to many transactions
+  createdAt    DateTime      @default(now()) // When the slip was uploaded
+  processedAt  DateTime?                    // When OCR processing finished (nullable)
 
-  @@map("slips")
+  @@map("slips") // Map to DB table name
 }
