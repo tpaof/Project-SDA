@@ -15,7 +15,17 @@ pnpm dev
 
 # then run
 pnpm tsx scripts/test-transactions.ts
+pnpm tsx scripts/test-slips.ts
+pnpm tsx scripts/test-db-connection.ts
+# or
+pnpm test:db-connect
+pnpm test:slips
+pnpm test:transactions
 
 # if it not work, try
-pnpm pris migration dev
+pnpm prisma migration reset
+pnpm prisma migration dev
+# or
+pnpm db:migrate
+
 # and run the script again (all cases should be [PASS])
