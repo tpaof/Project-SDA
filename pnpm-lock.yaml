@@ -214,6 +214,8 @@ importers:
         specifier: ^8.54.0
         version: 8.54.0(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
 
+  server/src/services/ocr-worker: {}
+
 packages:
 
   '@babel/code-frame@7.29.0':

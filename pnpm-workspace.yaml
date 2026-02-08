@@ -1,6 +1,7 @@
 packages:
   - client
   - server
+  - server/src/services/ocr-worker
   - services/*
 
 onlyBuiltDependencies:

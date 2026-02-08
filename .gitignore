@@ -8,3 +8,8 @@ TODO.md
 .github/
 .agent/
 .gemini/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
