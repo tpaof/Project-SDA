@@ -17,9 +17,17 @@ RUN pnpm --filter server exec prisma generate
 RUN pnpm --filter server run build
 
 # ------------------------------
-# Runtime stage
+# Development stage (hot-reload)
 # ------------------------------
-FROM node:20-alpine
+FROM builder AS dev
+WORKDIR /app
+EXPOSE 3000
+CMD ["pnpm", "--filter", "server", "run", "dev"]
+
+# ------------------------------
+# Runtime stage (production)
+# ------------------------------
+FROM node:20-alpine AS runtime
 
 RUN addgroup -g 1000 node && adduser -u 1000 -G node -D node
 
