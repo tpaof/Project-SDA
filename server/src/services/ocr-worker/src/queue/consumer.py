@@ -52,6 +52,12 @@ def start_consumer():
                 image_height=h
             )
 
+            # Inject missing fields for Frontend compatibility
+            if isinstance(parsed, dict):
+                parsed["confidence"] = ocr_result.get("confidence_avg", 0)
+                parsed["rawText"] = ocr_result.get("raw_text", "")
+                parsed["transactionId"] = job_id  # Use job_id as transactionId
+
             log_ocr_result(job_id, {
                 "job_id": job_id,
                 "image_path": image_path,
