@@ -29,5 +29,21 @@ services:
       timeout: 5s
       retries: 5
 
+  ocr-worker:
+    build:
+      context: ./server/src/services/ocr-worker
+      dockerfile: Dockerfile
+    container_name: moneymate-ocr-worker
+    restart: unless-stopped
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./server/src/services/ocr-worker:/app
+
 volumes:
   postgres_data:
