@@ -9,7 +9,9 @@ TODO.md
 .agent/
 .gemini/
 
+
 # Python
 __pycache__/
 *.pyc
 .venv/
+server/src/services/ocr-worker/logs/

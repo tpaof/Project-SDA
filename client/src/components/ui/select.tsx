@@ -106,7 +106,7 @@ export const SelectContent: React.FC<SelectContentProps> = ({
     <div
       ref={ref}
       className={cn(
-        "absolute z-[100] min-w-32 max-h-[200px] rounded-lg border border-gray-300 bg-white text-foreground shadow-lg animate-in fade-in-0 zoom-in-95 w-full overflow-y-auto py-1",
+        "absolute z-[100] min-w-32 max-h-[300px] rounded-lg border border-gray-300 bg-white text-foreground shadow-lg animate-in fade-in-0 zoom-in-95 w-full overflow-y-auto py-1",
         position === "bottom" && "top-full mt-2 left-0",
         position === "top" && "bottom-full mb-2 left-0",
         className

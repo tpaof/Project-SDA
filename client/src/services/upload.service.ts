@@ -23,6 +23,8 @@ export type OcrResult = {
   transactionId?: string;
   confidence?: number;
   rawText?: string;
+  type?: "income" | "expense";
+  category?: string;
 };
 
 export type UploadProgress = {
@@ -57,7 +59,7 @@ const uploadService = {
     const formData = new FormData();
     formData.append("slip", file);
 
-    const response = await api.post<UploadResponse>("/slips/upload", formData, {
+    const response = await api.post<{ data: Slip }>("/slips/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -70,22 +72,27 @@ const uploadService = {
         }
       },
     });
-    return response.data;
+    
+    // Adapter: map backend response { data: Slip } to frontend expectation { slip: Slip, message: string }
+    return {
+      slip: response.data.data,
+      message: "Upload successful"
+    };
   },
 
   async getSlipStatus(slipId: string): Promise<Slip> {
-    const response = await api.get<Slip>(`/slips/${slipId}`);
-    return response.data;
+    const response = await api.get<{ data: Slip }>(`/slips/${slipId}`);
+    return response.data.data;
   },
 
   async getSlipResult(slipId: string): Promise<{ ocrResult: OcrResult }> {
-    const response = await api.get<{ ocrResult: OcrResult }>(`/slips/${slipId}/result`);
-    return response.data;
+    const response = await api.get<{ data: { ocrResult: OcrResult } }>(`/slips/${slipId}/result`);
+    return response.data.data;
   },
 
   async getSlipHistory(): Promise<Slip[]> {
-    const response = await api.get<Slip[]>("/slips");
-    return response.data;
+    const response = await api.get<{ data: Slip[] }>("/slips");
+    return response.data.data;
   },
 };
 

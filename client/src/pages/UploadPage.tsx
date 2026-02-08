@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -26,7 +25,7 @@ import { UploadHistory } from "@/components/upload/UploadHistory";
 export function UploadPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"upload" | "history">("upload");
+
 
   const {
     selectedFile,
@@ -37,7 +36,6 @@ export function UploadPage() {
     processingStatus,
     processingError,
     uploadHistory,
-    isLoadingHistory,
     selectFile,
     clearFile,
     uploadFile,
@@ -69,7 +67,7 @@ export function UploadPage() {
         description: "The extracted data has been saved successfully.",
       });
       navigate("/dashboard");
-    } catch (error) {
+    } catch {
       toast.error("Failed to save", {
         description: "Could not save the transaction. Please try again.",
       });
@@ -218,7 +216,7 @@ export function UploadPage() {
               <Card className="bg-blue-50/50 border-blue-100">
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
                       <CreditCard className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
