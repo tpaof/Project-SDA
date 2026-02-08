@@ -32,7 +32,7 @@ services:
 
   client:
     build:
-      context: .
+      context: . 
       dockerfile: docker/Dockerfile.client
       target: dev
     container_name: moneymate-client
@@ -59,6 +59,7 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/moneymate
+      - REDIS_URL=redis://redis:6379
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
