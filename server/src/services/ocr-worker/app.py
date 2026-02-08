@@ -18,7 +18,7 @@ app = Flask(__name__)
 def health():
     """
     Health check endpoint
-    ใช้ตรวจสถานะ service, Redis, Tesseract
+    ใช้ตรวจสถานะ service, Redis, EasyOCR
     """
     return jsonify(get_health_status()), 200
 
