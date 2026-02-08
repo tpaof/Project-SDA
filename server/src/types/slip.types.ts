@@ -8,11 +8,12 @@ export const SlipStatus = {
 export type SlipStatusValue = (typeof SlipStatus)[keyof typeof SlipStatus];
 
 export interface OcrJobMessage {
-  jobId: string;
+  job_id: string; // Matches Python worker
+  image_path: string; // Absolute path
+  callback_url: string; // Where to POST results
+  // Metadata for backend reference (optional, worker preserves unknown keys)
   slipId: string;
   userId: string;
-  filePath: string;
-  timestamp: string;
 }
 
 export interface SlipResponse {

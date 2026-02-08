@@ -5,6 +5,9 @@ import { upload } from '../middleware/upload.middleware.js';
 
 const router: Router = Router();
 
+// OCR Callback (Public/Internal) - Must be before authMiddleware
+router.post('/callback', slipController.handleOcrCallback.bind(slipController));
+
 // All slip routes require authentication
 router.use(authMiddleware);
 
