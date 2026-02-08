@@ -8,5 +8,6 @@ flask           # health + callback
 requests        # callback POST
 easyocr         # OCR engine
 # CPU-only PyTorch (ดาวน์โหลดจาก PyTorch CPU wheel index)
-torch
-torchvision
+torch==2.0.1+cpu
+torchvision==0.15.2+cpu
+
