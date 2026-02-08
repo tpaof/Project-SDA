@@ -7,6 +7,7 @@ import { RegisterPage } from "@/pages/auth/RegisterPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "@/pages/auth/ResetPasswordPage";
 import { DashboardPage } from "@/pages/DashboardPage";
+import { UploadPage } from "@/pages/UploadPage";
 
 function App() {
   return (
@@ -25,6 +26,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute>
+                <UploadPage />
               </ProtectedRoute>
             }
           />

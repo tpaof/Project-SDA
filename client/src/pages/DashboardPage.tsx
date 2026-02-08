@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import {
@@ -17,6 +17,8 @@ import {
   Trash2,
   Edit2,
   Calendar,
+  Download,
+  FileSpreadsheet,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,6 +48,7 @@ import { SpendingChart } from "@/components/dashboard/SpendingChart";
 import { MonthlyChart } from "@/components/dashboard/MonthlyChart";
 import { TrendChart } from "@/components/dashboard/TrendChart";
 import { cn } from "@/lib/utils";
+import { exportToExcel, exportToCSV } from "@/utils/export";
 import type { Transaction, CreateTransactionRequest, UpdateTransactionRequest } from "@/services/transaction.service";
 
 
@@ -148,6 +151,7 @@ interface FilterBarProps {
   onFilterChange: (filters: FilterState) => void;
   onAddClick: () => void;
   transactions: Transaction[];
+  filteredTransactions: Transaction[];
 }
 
 // ============================================
@@ -254,7 +258,7 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
 // ============================================
 // FILTER BAR COMPONENT
 // ============================================
-const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: FilterBarProps) => {
+const FilterBar = ({ filters, onFilterChange, onAddClick, transactions, filteredTransactions }: FilterBarProps) => {
   // Get unique categories from transactions
   const categories = useMemo(() => {
     const uniqueCategories = new Set<string>();
@@ -342,6 +346,7 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
           </SelectContent>
         </Select>
       </div>
+
       <Button onClick={onAddClick} className="btn-gradient text-white border-0 gap-2">
         <Plus className="w-4 h-4" />
         Add Transaction
@@ -354,6 +359,7 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
 // MAIN DASHBOARD PAGE
 // ============================================
 export function DashboardPage() {
+  const navigate = useNavigate();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const { transactions, pagination, isLoading, fetchTransactions, deleteTransaction, createTransaction, updateTransaction } = useTransactions();
   
@@ -368,6 +374,7 @@ export function DashboardPage() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
+  const [pageSize, setPageSize] = useState(10);
 
   // Hide-on-scroll navbar state
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
@@ -474,7 +481,12 @@ export function DashboardPage() {
   };
 
   const handlePageChange = (page: number) => {
-    fetchTransactions({ page, limit: 10 });
+    fetchTransactions({ page, limit: pageSize });
+  };
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    fetchTransactions({ page: 1, limit: size });
   };
 
   // Loading state
@@ -712,12 +724,18 @@ export function DashboardPage() {
           transition={{ duration: 0.5, delay: 0.5 }}
           className="space-y-4"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h3 className="text-xl font-bold font-['Plus_Jakarta_Sans']">Recent Transactions</h3>
-            <FilterBar filters={filters} onFilterChange={setFilters} onAddClick={handleAddClick} transactions={transactions} />
+            <FilterBar 
+              filters={filters} 
+              onFilterChange={setFilters} 
+              onAddClick={handleAddClick} 
+              transactions={transactions}
+              filteredTransactions={filteredTransactions}
+            />
           </div>
 
-          <Card className="border border-gray-200 bg-white overflow-hidden">
+          <Card className="border border-gray-200 bg-white">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -792,16 +810,55 @@ export function DashboardPage() {
               </table>
             </div>
 
-            {/* Pagination */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="py-4 px-6 border-t border-border/50">
-                <Pagination
-                  currentPage={pagination.page}
-                  totalPages={pagination.totalPages}
-                  onPageChange={handlePageChange}
-                />
+            {/* Footer with Pagination (center) and Export (right) */}
+            <div className="py-4 px-6 border-t border-border/50 flex items-center">
+              {/* Left spacer */}
+              <div className="w-24" />
+
+              {/* Pagination - Center */}
+              <div className="flex-1 flex justify-center">
+                {pagination && pagination.totalPages >= 1 && (
+                  <Pagination
+                    currentPage={pagination.page}
+                    totalPages={pagination.totalPages}
+                    pageSize={pageSize}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                  />
+                )}
               </div>
-            )}
+
+              {/* Export Dropdown - Right */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 border-gray-200 hover:bg-gray-50 w-24"
+                    disabled={filteredTransactions.length === 0}
+                  >
+                    <Download className="w-4 h-4" />
+                    Export
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+                  <DropdownMenuItem
+                    onClick={() => exportToExcel(filteredTransactions, { filename: "moneymate_transactions" })}
+                    className="gap-2 cursor-pointer"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 text-green-600" />
+                    Export as Excel
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => exportToCSV(filteredTransactions, { filename: "moneymate_transactions" })}
+                    className="gap-2 cursor-pointer"
+                  >
+                    <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+                    Export as CSV
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </Card>
         </motion.div>
       </main>

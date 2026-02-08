@@ -13,6 +13,7 @@ interface SelectTriggerProps extends React.HTMLAttributes<HTMLButtonElement> {
 
 interface SelectContentProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
+  position?: "top" | "bottom";
 }
 
 interface SelectItemProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -74,7 +75,12 @@ export const SelectValue: React.FC<{ placeholder?: string }> = ({ placeholder })
   return <span className={!value ? "text-muted-foreground" : ""}>{value || placeholder}</span>;
 };
 
-export const SelectContent: React.FC<SelectContentProps> = ({ className, children, ...props }) => {
+export const SelectContent: React.FC<SelectContentProps> = ({ 
+  className, 
+  children, 
+  position = "bottom",
+  ...props 
+}) => {
   const { isOpen, setIsOpen } = React.useContext(SelectContext);
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -100,7 +106,9 @@ export const SelectContent: React.FC<SelectContentProps> = ({ className, childre
     <div
       ref={ref}
       className={cn(
-        "absolute z-50 min-w-32 max-h-[200px] rounded-lg border border-gray-300 bg-white text-foreground shadow-lg animate-in fade-in-0 zoom-in-95 top-full mt-2 left-0 w-full overflow-y-auto py-1",
+        "absolute z-[100] min-w-32 max-h-[200px] rounded-lg border border-gray-300 bg-white text-foreground shadow-lg animate-in fade-in-0 zoom-in-95 w-full overflow-y-auto py-1",
+        position === "bottom" && "top-full mt-2 left-0",
+        position === "top" && "bottom-full mb-2 left-0",
         className
       )}
       {...props}
@@ -121,14 +129,14 @@ export const SelectItem: React.FC<SelectItemProps> = ({ className, value, childr
         setIsOpen(false);
       }}
       className={cn(
-        "relative flex w-full cursor-pointer select-none items-center rounded-lg py-1.5 pl-8 pr-2 text-sm outline-none transition-colors hover:bg-accent/80 hover:text-accent-foreground focus:bg-accent/80 focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
-        isSelected && "bg-accent",
+        "relative flex w-full cursor-pointer select-none items-center rounded-md py-2.5 px-3 text-sm outline-none transition-colors hover:bg-orange-50 hover:text-orange-900",
+        isSelected && "bg-orange-100 text-orange-900 font-medium",
         className
       )}
       {...props}
     >
       {isSelected && (
-        <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+        <span className="absolute left-1 flex h-3.5 w-3.5 items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -139,13 +147,13 @@ export const SelectItem: React.FC<SelectItemProps> = ({ className, value, childr
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="h-4 w-4"
+            className="h-3.5 w-3.5"
           >
             <polyline points="20 6 9 17 4 12" />
           </svg>
         </span>
       )}
-      {children}
+      <span className={cn("truncate", isSelected && "pl-4")}>{children}</span>
     </div>
   );
 };
