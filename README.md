@@ -139,9 +139,39 @@ pnpm clean
 
 ---
 
-## 🐳 Container Development
+## Monorepo Structure
 
-### 🎯 Quick Start with Docker
+- `client` - React frontend
+- `server` - Express backend
+- `server/src/services/ocr-worker` - OCR worker service
+
+## Documentation
+
+- [Client](./client/README.md)
+- [Server](./server/README.md)
+
+## Docker Usage
+
+```bash
+# Start development environment (all services)
+pnpm docker:dev
+
+# Start production simulation
+pnpm docker:prod
+
+# Stop all containers
+pnpm docker:down
+
+# Follow logs
+pnpm docker:logs
+
+# Cleanup Docker system
+pnpm docker:prune
+```
+
+## Container Development
+
+### Quick Start with Docker
 
 ```bash
 # Build and start all containers
