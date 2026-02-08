@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Loader2, Wallet, ArrowUpRight, ArrowDownRight, Upload, Camera, X, FileImage } from "lucide-react";
+import { Loader2, Wallet, ArrowUpRight, ArrowDownRight, Camera, FileImage, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,9 +21,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useDropzone } from "react-dropzone";
-import { uploadService, type Slip, type OcrResult } from "@/services/upload.service";
-import { UploadProgress } from "@/components/upload/UploadProgress";
-import { ProcessingStatus } from "@/components/upload/ProcessingStatus";
+import { uploadService, type OcrResult as OcrResultType } from "@/services/upload.service";
+import { OcrResult as OcrResultComponent } from "@/components/upload/OcrResult";
 import type {
   Transaction,
   CreateTransactionRequest,
@@ -81,85 +80,164 @@ function getInitialCustomCategory(transaction?: Transaction | null): string {
 }
 
 // ==================== UPLOAD TAB COMPONENT ====================
-interface UploadTabProps {
-  onOcrComplete: (result: OcrResult) => void;
-  onBack: () => void;
+interface BatchItem {
+  id: string;
+  file: File;
+  previewUrl: string;
+  status: "pending" | "uploading" | "processing" | "ready" | "saved" | "failed";
+  progress: number;
+  slipId?: string;
+  ocrResult?: OcrResultType;
+  error?: string;
 }
 
-const UploadTab: React.FC<UploadTabProps> = ({ onOcrComplete, onBack }) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadProgress, setUploadProgress] = useState<{ loaded: number; total: number; percentage: number } | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadedSlip, setUploadedSlip] = useState<Slip | null>(null);
-  const [processingStatus, setProcessingStatus] = useState<Slip["status"] | null>(null);
+interface UploadTabProps {
+  items: BatchItem[];
+  setItems: React.Dispatch<React.SetStateAction<BatchItem[]>>;
+  reviewItemId: string | null;
+  setReviewItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  onBatchSave: (data: CreateTransactionRequest) => Promise<void>;
+  onBack: () => void;
+  currentType: "income" | "expense";
+  setCurrentType: (type: "income" | "expense") => void;
+}
+
+const UploadTab: React.FC<UploadTabProps> = ({ 
+  items, 
+  setItems, 
+  reviewItemId, 
+  setReviewItemId, 
+  onBatchSave, 
+  onBack,
+  setCurrentType
+}) => {
+  const updateItem = useCallback((id: string, updates: Partial<BatchItem>) => {
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, ...updates } : item)));
+  }, [setItems]);
+
+  const pollStatus = useCallback(async (itemId: string, slipId: string) => {
+    const interval = setInterval(async () => {
+      try {
+        const slip = await uploadService.getSlipStatus(slipId);
+        
+        if (slip.status === "completed") {
+          clearInterval(interval);
+          const result = await uploadService.getSlipResult(slipId);
+          // Check if item still exists before updating
+          setItems(currentItems => {
+            if (!currentItems.find(i => i.id === itemId)) return currentItems;
+            return currentItems.map(item => 
+              item.id === itemId 
+                ? { ...item, status: "ready", ocrResult: result.ocrResult } 
+                : item
+            );
+          });
+        } else if (slip.status === "failed") {
+          clearInterval(interval);
+          setItems(currentItems => 
+            currentItems.map(item => 
+              item.id === itemId 
+                ? { ...item, status: "failed", error: "Processing failed" } 
+                : item
+            )
+          );
+        }
+      } catch (error) {
+        // Continue polling on error
+        console.error("Polling error:", error);
+      }
+    }, 3000);
+  }, [setItems]);
+
+  const processItem = useCallback(async (item: BatchItem) => {
+    updateItem(item.id, { status: "uploading", progress: 0 });
+
+    try {
+      const response = await uploadService.uploadSlip(item.file, (progress) => {
+        updateItem(item.id, { 
+          progress: progress.percentage,
+          status: progress.percentage === 100 ? "processing" : "uploading"
+        });
+      });
+
+      updateItem(item.id, { slipId: response.slip.id, status: "processing" });
+      pollStatus(item.id, response.slip.id);
+    } catch (error) {
+      updateItem(item.id, { 
+        status: "failed", 
+        error: error instanceof Error ? error.message : "Upload failed" 
+      });
+    }
+  }, [updateItem, pollStatus]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) {
-      const file = acceptedFiles[0];
-      const error = uploadService.validateFile(file);
-      if (error) {
-        setUploadError(error);
-        return;
-      }
-      setSelectedFile(file);
-      setUploadError(null);
+    const newItems: BatchItem[] = acceptedFiles.map((file) => ({
+      id: Math.random().toString(36).substring(7),
+      file,
+      previewUrl: URL.createObjectURL(file),
+      status: "pending",
+      progress: 0,
+    }));
+
+    setItems((prev) => [...prev, ...newItems]);
+    
+    // Start processing new items
+    newItems.forEach((item) => processItem(item));
+  }, [setItems, processItem]);
+
+
+
+
+
+  const handleRemove = (id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+    if (reviewItemId === id) setReviewItemId(null);
+  };
+
+  const handleSaveTransaction = async (data: {
+    amount: number;
+    date: string;
+    description: string;
+    category: string;
+    type: "income" | "expense";
+  }) => {
+    if (!reviewItemId) return;
+    
+    try {
+      await onBatchSave({
+        ...data,
+        amount: data.amount,
+      });
+      updateItem(reviewItemId, { status: "saved" });
+      setReviewItemId(null);
+    } catch (error) {
+      console.error("Failed to save transaction:", error);
+      // Ideally show error toast
     }
-  }, []);
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { "image/jpeg": [".jpg", ".jpeg"], "image/png": [".png"], "image/webp": [".webp"] },
     maxSize: 10 * 1024 * 1024,
-    multiple: false,
+    multiple: true,
   });
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
-    setIsUploading(true);
-    setUploadError(null);
-
-    try {
-      const response = await uploadService.uploadSlip(selectedFile, (progress) => {
-        setUploadProgress(progress);
-      });
-      setUploadedSlip(response.slip);
-      setProcessingStatus(response.slip.status);
-      pollStatus(response.slip.id);
-    } catch (error) {
-      setUploadError(error instanceof Error ? error.message : "Upload failed");
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const pollStatus = async (slipId: string) => {
-    const interval = setInterval(async () => {
-      try {
-        const slip = await uploadService.getSlipStatus(slipId);
-        setProcessingStatus(slip.status);
-
-        if (slip.status === "completed") {
-          clearInterval(interval);
-          const result = await uploadService.getSlipResult(slipId);
-          onOcrComplete(result.ocrResult);
-        } else if (slip.status === "failed") {
-          clearInterval(interval);
-          setUploadError("Processing failed. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error polling status:", error);
-      }
-    }, 3000);
-  };
-
-  // Show processing state
-  if (uploadedSlip && processingStatus && processingStatus !== "completed") {
+  // Review Mode
+  const reviewItem = items.find((i) => i.id === reviewItemId);
+  if (reviewItem?.ocrResult) {
     return (
-      <div className="py-4">
-        <ProcessingStatus
-          status={processingStatus}
-          error={uploadError || undefined}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 mb-2">
+          <Button variant="ghost" size="sm" onClick={() => setReviewItemId(null)}>
+            ← Back to list
+          </Button>
+        </div>
+        <OcrResultComponent 
+          result={reviewItem.ocrResult} 
+          onConfirm={handleSaveTransaction}
+          onCancel={() => setReviewItemId(null)}
+          onTypeChange={setCurrentType}
         />
       </div>
     );
@@ -167,75 +245,66 @@ const UploadTab: React.FC<UploadTabProps> = ({ onOcrComplete, onBack }) => {
 
   return (
     <div className="space-y-4">
-      {/* Back button */}
       <Button variant="ghost" size="sm" onClick={onBack} className="mb-2">
         ← Back to manual entry
       </Button>
 
-      {/* Dropzone or Preview */}
-      {!selectedFile && !isUploading && (
-        <div
-          {...getRootProps()}
-          className={cn(
-            "border-2 border-dashed rounded-2xl p-8 transition-all duration-300 cursor-pointer",
-            "flex flex-col items-center justify-center gap-4 min-h-[200px]",
-            isDragActive ? "border-orange-500 bg-orange-50/50" : "border-gray-300 hover:border-orange-400"
-          )}
-        >
-          <input {...getInputProps()} />
-          <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
-            <Camera className="w-7 h-7 text-gray-400" />
-          </div>
-          <div className="text-center">
-            <p className="font-medium text-gray-700">Drop your slip here or click to browse</p>
-            <p className="text-sm text-gray-500 mt-1">JPG, PNG, WebP up to 10MB</p>
-          </div>
-        </div>
-      )}
+      {/* Dropzone */}
+      <div
+        {...getRootProps()}
+        className={cn(
+          "border-2 border-dashed rounded-2xl p-6 transition-all duration-300 cursor-pointer",
+          "flex flex-col items-center justify-center gap-2",
+          isDragActive ? "border-orange-500 bg-orange-50/50" : "border-gray-300 hover:border-orange-400"
+        )}
+      >
+        <input {...getInputProps()} />
+        <Camera className="w-8 h-8 text-gray-400" />
+        <p className="text-sm font-medium text-gray-700">Drop slips here (Multiple likely)</p>
+      </div>
 
-      {/* Selected File Preview */}
-      {selectedFile && !isUploading && (
-        <div className="space-y-4">
-          <div className="relative rounded-xl overflow-hidden border border-gray-200">
-            <img
-              src={URL.createObjectURL(selectedFile)}
-              alt="Preview"
-              className="w-full h-48 object-contain bg-gray-50"
-            />
-            <button
-              onClick={() => setSelectedFile(null)}
-              className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-gray-100"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => setSelectedFile(null)} className="flex-1">
-              Change
-            </Button>
-            <Button onClick={handleUpload} className="flex-1 btn-gradient text-white border-0">
-              <Upload className="w-4 h-4 mr-2" />
-              Upload & Analyze
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* List */}
+      <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+        {items.map((item) => (
+          <div key={item.id} className={cn(
+            "flex items-center gap-3 p-3 rounded-xl border transition-all",
+            item.status === "saved" ? "bg-green-50 border-green-200 opacity-60" : "bg-white border-gray-100 shadow-sm"
+          )}>
+            <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden shrink-0">
+              <img src={item.previewUrl} alt="Slip" className="w-full h-full object-cover" />
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium truncate">{item.file.name}</p>
+                {item.status === "saved" && <span className="text-xs text-green-600 font-bold px-2 py-0.5 bg-green-100 rounded-full">Saved</span>}
+              </div>
+              
+              <div className="mt-1">
+                 {item.status === "uploading" && (
+                   <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                     <div className="h-full bg-blue-500 transition-all duration-300" style={{ width: `${item.progress}%` }} />
+                   </div>
+                 )}
+                 {item.status === "processing" && <span className="text-xs text-blue-600 animate-pulse">Processing OCR...</span>}
+                 {item.status === "ready" && <span className="text-xs text-green-600">Ready to review</span>}
+                 {item.status === "failed" && <span className="text-xs text-red-500">{item.error}</span>}
+              </div>
+            </div>
 
-      {/* Upload Progress */}
-      {isUploading && selectedFile && (
-        <UploadProgress
-          fileName={selectedFile.name}
-          progress={uploadProgress?.percentage || 0}
-          status="uploading"
-        />
-      )}
-
-      {/* Error */}
-      {uploadError && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
-          {uploadError}
-        </div>
-      )}
+            <div className="flex items-center gap-1">
+              {item.status === "ready" && (
+                <Button size="sm" onClick={() => setReviewItemId(item.id)} className="h-8 text-xs btn-gradient text-white border-0">
+                  Review
+                </Button>
+              )}
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => handleRemove(item.id)}>
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -266,6 +335,11 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState<"manual" | "upload">("manual");
+  const [currentType, setCurrentType] = useState<"income" | "expense">("expense");
+  
+  // Batch upload state (lifted up from UploadTab)
+  const [batchItems, setBatchItems] = useState<BatchItem[]>([]);
+  const [reviewItemId, setReviewItemId] = useState<string | null>(null);
 
   const isOtherCategory = formData.category === "Other";
 
@@ -315,16 +389,9 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
     }
   };
 
-  const handleOcrComplete = (ocrResult: OcrResult) => {
-    // Pre-fill form with OCR data
-    setFormData({
-      type: "expense",
-      amount: ocrResult.amount?.toString() || "",
-      description: ocrResult.description || ocrResult.recipientName || "",
-      category: "",
-      date: ocrResult.date || new Date().toISOString().split("T")[0],
-    });
-    setActiveTab("manual");
+  const handleBatchSave = async (data: CreateTransactionRequest) => {
+    // Save transaction but keep modal open
+    await onSubmit(data);
   };
 
   // If editing, always show manual form
@@ -428,7 +495,7 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="top">
                       {CATEGORIES.map((cat) => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                       ))}
@@ -495,8 +562,10 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-lg",
-              formData.type === "expense" ? "bg-rose-100 text-rose-600" : "bg-emerald-100 text-emerald-600"
+              "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
+              (activeTab === "manual" ? formData.type : currentType) === "expense" 
+                ? "bg-rose-100 text-rose-600" 
+                : "bg-emerald-100 text-emerald-600"
             )}>
               <Wallet className="h-5 w-5" />
             </div>
@@ -548,8 +617,14 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
         <DialogBody>
           {activeTab === "upload" ? (
             <UploadTab
-              onOcrComplete={handleOcrComplete}
+              items={batchItems}
+              setItems={setBatchItems}
+              reviewItemId={reviewItemId}
+              setReviewItemId={setReviewItemId}
+              onBatchSave={handleBatchSave}
               onBack={() => setActiveTab("manual")}
+              currentType={currentType}
+              setCurrentType={setCurrentType}
             />
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -632,7 +707,7 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
                     <SelectTrigger className="h-11">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="top">
                       {CATEGORIES.map((cat) => (
                         <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                       ))}
@@ -707,7 +782,7 @@ const TransactionModalInner: React.FC<TransactionModalInnerProps> = ({
 // Wrapper component with key-based reset pattern
 export const TransactionModal: React.FC<TransactionModalProps> = (props) => {
   const key = props.transaction?.id || "new";
-  return <TransactionModalInner key={key} {...props} />;
+  return <TransactionModalInner key={key} isLoading={false} {...props} />;
 };
 
 export default TransactionModal;
