@@ -1,0 +1,40 @@
+# ------------------------------
+# Build stage
+# ------------------------------
+FROM node:20-alpine AS builder
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apk add --no-cache libc6-compat
+
+WORKDIR /app
+
+# Workspace root + server
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY server ./server
+
+RUN pnpm install --frozen-lockfile
+RUN pnpm --filter server exec prisma generate
+RUN pnpm --filter server run build
+
+# ------------------------------
+# Runtime stage
+# ------------------------------
+FROM node:20-alpine
+
+RUN addgroup -g 1000 node && adduser -u 1000 -G node -D node
+
+WORKDIR /app
+
+COPY --from=builder /app/server/package.json ./
+COPY --from=builder /app/server/dist ./dist
+COPY --from=builder /app/server/node_modules ./node_modules
+COPY --from=builder /app/server/prisma ./prisma
+
+USER node
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget -q -O- http://localhost:3000/health || exit 1
+
+CMD ["node", "dist/index.js"]

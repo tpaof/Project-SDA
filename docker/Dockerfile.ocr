@@ -1,0 +1,27 @@
+# ------------------------------
+# OCR worker (Python + Tesseract + EasyOCR)
+# ------------------------------
+FROM python:3.11-slim
+
+# System deps: Tesseract, languages, libgl1 for OpenCV/EasyOCR
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tesseract-ocr \
+    tesseract-ocr-eng \
+    tesseract-ocr-tha \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Python deps
+COPY server/src/services/ocr-worker/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# App source
+COPY server/src/services/ocr-worker/ ./
+
+EXPOSE 8080
+
+CMD ["python", "app.py"]

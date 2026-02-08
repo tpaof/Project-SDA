@@ -31,8 +31,8 @@ services:
 
   ocr-worker:
     build:
-      context: ./server/src/services/ocr-worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/Dockerfile.ocr
     container_name: moneymate-ocr-worker
     restart: unless-stopped
     environment:
