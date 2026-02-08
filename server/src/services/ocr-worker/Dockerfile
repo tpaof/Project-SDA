@@ -42,10 +42,7 @@ COPY . .
 # -------------------------
 # Environment variables
 # -------------------------
-ENV REDIS_HOST=localhost \
-    REDIS_PORT=6379 \
-    REDIS_CHANNEL=ocr:jobs \
-    PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED=1
 
 # -------------------------
 # Expose health port
@@ -56,7 +53,7 @@ EXPOSE 8080
 # Healthcheck
 # -------------------------
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8080/health || exit 1
+CMD curl -f http://localhost:8080/health || exit 1
 
 # -------------------------
 # Start app

@@ -2,6 +2,8 @@ import type { Request, Response } from 'express';
 import multer from 'multer';
 import { slipService } from '../services/slip.service.js';
 import { AppError } from '../utils/AppError.js';
+import { SlipStatus } from '../types/slip.types.js';
+import type { SlipStatusValue } from '../types/slip.types.js';
 
 export class SlipController {
   // POST /api/slips/upload
@@ -41,7 +43,7 @@ export class SlipController {
     try {
       const slip = await slipService.getStatus(
         req.user!.userId,
-        req.params.id,
+        req.params.id as string,
       );
       res.status(200).json({ data: slip });
     } catch (error) {
@@ -60,7 +62,7 @@ export class SlipController {
     try {
       const result = await slipService.getResult(
         req.user!.userId,
-        req.params.id,
+        req.params.id as string,
       );
       res.status(200).json({ data: result });
     } catch (error) {
@@ -71,6 +73,36 @@ export class SlipController {
       const message =
         error instanceof Error ? error.message : 'Failed to get slip result';
       res.status(500).json({ error: message });
+    }
+  }
+
+  // POST /api/slips/callback
+  async handleOcrCallback(req: Request, res: Response): Promise<void> {
+    try {
+      // notify.py sends: { slipId, status, data }
+      const { slipId, status, data } = req.body;
+
+      if (!slipId || !status) {
+        res.status(400).json({ error: 'Missing slipId or status' });
+        return;
+      }
+
+      console.log(`[OCR Callback] Received for slip ${slipId}: ${status}`);
+
+      // Map worker status to SlipStatus
+      // Worker sends: "success" or "failed"
+      // Backend expects: "completed" or "failed"
+      let slipStatus: SlipStatusValue = SlipStatus.FAILED;
+      if (status === 'success') {
+        slipStatus = SlipStatus.COMPLETED;
+      }
+
+      await slipService.updateStatus(slipId, slipStatus, data);
+
+      res.status(200).json({ status: 'ok' });
+    } catch (error) {
+      console.error('[OCR Callback Error]', error);
+      res.status(500).json({ error: 'Internal callback error' });
     }
   }
 

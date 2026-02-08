@@ -3,7 +3,16 @@ import numpy as np
 from src.utils.logger import log_image
 
 
-def preprocess_image(path, job_id=None):
+def preprocess_image(path: str, job_id: str = None):
+    """
+    Preprocess image for OCR (Thai + Number friendly)
+
+    Strategy:
+    - Preserve Thai characters (no hard threshold)
+    - Improve contrast gently (CLAHE)
+    - Reduce noise without breaking strokes
+    """
+
     img = cv2.imread(path)
 
     if img is None:
@@ -12,23 +21,59 @@ def preprocess_image(path, job_id=None):
     if job_id:
         log_image(job_id, img, "original")
 
-    # 1️⃣ แปลงเป็น grayscale (พอ)
+    # --------------------
+    # 1. Convert to grayscale
+    # --------------------
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # 2️⃣ ลด noise เบา ๆ (kernel เล็กลง)
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
+    # --------------------
+    # 2. Gentle denoise (preserve edges)
+    # --------------------
+    gray = cv2.bilateralFilter(
+        gray,
+        d=9,
+        sigmaColor=75,
+        sigmaSpace=75
+    )
 
-    # 3️⃣ เพิ่ม contrast แบบไม่ทำลายตัวอักษร
-    # ใช้ adaptive histogram (CLAHE)
+    # --------------------
+    # 3. Local contrast enhancement (SAFE)
+    # --------------------
+    # CLAHE improves numbers without killing Thai strokes
     clahe = cv2.createCLAHE(
         clipLimit=2.0,
         tileGridSize=(8, 8)
     )
     enhanced = clahe.apply(gray)
 
-    # 4️⃣ resize เล็กน้อยให้ตัวอักษรชัดขึ้น
-    enhanced = cv2.resize(
+    # --------------------
+    # 4. Mild adaptive threshold (NOT binary)
+    # --------------------
+    # Key: Gaussian + small blockSize
+    thresh = cv2.adaptiveThreshold(
         enhanced,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY,
+        blockSize=31,
+        C=5
+    )
+
+    # --------------------
+    # 5. Blend original & threshold (IMPORTANT)
+    # --------------------
+    # This prevents over-destruction of characters
+    final = cv2.addWeighted(
+        enhanced, 0.7,
+        thresh, 0.3,
+        0
+    )
+
+    # --------------------
+    # 6. Resize (moderate, not aggressive)
+    # --------------------
+    final = cv2.resize(
+        final,
         None,
         fx=1.3,
         fy=1.3,
@@ -36,7 +81,6 @@ def preprocess_image(path, job_id=None):
     )
 
     if job_id:
-        log_image(job_id, enhanced, "preprocessed")
+        log_image(job_id, final, "preprocessed")
 
-    # ⚠️ สำคัญ: คืน grayscale (ไม่ threshold)
-    return enhanced
+    return final

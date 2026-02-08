@@ -12,12 +12,17 @@ export class QueueService {
     userId: string,
     filePath: string,
   ): Promise<OcrJobMessage> {
+    const port = process.env.PORT || 3000;
+    const callbackUrl = `http://localhost:${port}/api/slips/callback`;
+    // Ensure absolute path if not already
+    const absolutePath = filePath.startsWith('/') ? filePath : `${process.cwd()}/${filePath}`;
+
     const job: OcrJobMessage = {
-      jobId: uuidv4(),
+      job_id: slipId, // Use slipId as job_id for easy tracking
+      image_path: absolutePath,
+      callback_url: callbackUrl,
       slipId,
       userId,
-      filePath,
-      timestamp: new Date().toISOString(),
     };
 
     await redis.publish(OCR_JOBS_CHANNEL, JSON.stringify(job));
