@@ -1,6 +1,6 @@
 # 💰 MoneyMate
 
-[![Status: Development](https://img.shields.io/badge/Status-Development-yellow)]()
+[![Status: Active Development](https://img.shields.io/badge/Status-Active_Development-brightgreen)]()
 [![Platform: Web](https://img.shields.io/badge/Platform-Web-blue)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -24,6 +24,7 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 | Express.js      | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)                 |
 | Python          | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)                          |
 | Flask           | ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)                             |
+| EasyOCR         | ![EasyOCR](https://img.shields.io/badge/EasyOCR-000000?style=for-the-badge&logo=python&logoColor=white)                        |
 | Redis           | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)                             |
 | Docker          | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)                          |
 | Kubernetes      | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)              |
@@ -31,6 +32,21 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 | Prisma          | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)                          |
 | Terraform       | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)                 |
 | pnpm            | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)                                |
+
+---
+
+## 📊 Progress
+
+```
+Phase 1: Setup          [██████████] 100%
+Phase 2: Auth           [██████████] 100%
+Phase 3: Core Features  [██████████] 100%
+Phase 4: OCR            [██████████] 100%
+Phase 5: Docker         [██████████] 100%
+Phase 6-8: K8s/Infra    [░░░░░░░░░░]   0%
+─────────────────────────────────────────
+Overall:                [████████░░] ~80%
+```
 
 ---
 

@@ -114,8 +114,8 @@ export function UploadPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Upload Area */}
           <div className="lg:col-span-2 space-y-6">
             {/* Page Title */}
@@ -123,10 +123,10 @@ export function UploadPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
                 Upload Bank Slip
               </h2>
-              <p className="text-gray-500 mt-1">
+              <p className="text-gray-500 mt-1 text-sm sm:text-base">
                 Upload an image of your bank transfer slip and let AI extract the details automatically.
               </p>
             </motion.div>
@@ -138,7 +138,7 @@ export function UploadPage() {
               transition={{ delay: 0.1 }}
             >
               <Card className="border border-gray-200 shadow-lg">
-                <CardContent className="p-6">
+                <CardContent className="p-4 sm:p-6">
                   {/* Dropzone */}
                   {showDropzone && (
                     <Dropzone
@@ -183,12 +183,12 @@ export function UploadPage() {
 
                   {/* Upload Actions */}
                   {showPreview && (
-                    <div className="flex gap-3 mt-6">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4 sm:mt-6">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={clearFile}
-                        className="flex-1 h-12"
+                        className="flex-1 h-11 sm:h-12 text-sm sm:text-base"
                       >
                         Change File
                       </Button>
@@ -196,9 +196,9 @@ export function UploadPage() {
                         type="button"
                         onClick={uploadFile}
                         disabled={isUploading}
-                        className="flex-1 h-12 btn-gradient text-white border-0 gap-2"
+                        className="flex-1 h-11 sm:h-12 btn-gradient text-white border-0 gap-2 text-sm sm:text-base"
                       >
-                        <Upload className="w-5 h-5" />
+                        <Upload className="w-4 h-4 sm:w-5 sm:h-5" />
                         Upload & Analyze
                       </Button>
                     </div>
@@ -214,16 +214,16 @@ export function UploadPage() {
               transition={{ delay: 0.2 }}
             >
               <Card className="bg-blue-50/50 border-blue-100">
-                <CardContent className="p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                      <CreditCard className="w-5 h-5 text-blue-600" />
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-start gap-2 sm:gap-3">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                      <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-gray-800">
+                      <h4 className="font-semibold text-gray-800 text-sm sm:text-base">
                         Tips for best results
                       </h4>
-                      <ul className="text-sm text-gray-600 mt-2 space-y-1">
+                      <ul className="text-xs sm:text-sm text-gray-600 mt-2 space-y-1">
                         <li>• Ensure the image is clear and well-lit</li>
                         <li>• Make sure all text is readable</li>
                         <li>• Supported formats: JPG, PNG, WebP</li>
@@ -243,12 +243,12 @@ export function UploadPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
             >
-              <Card className="border border-gray-200 shadow-lg sticky top-24">
-                <CardContent className="p-5">
-                  <div className="flex items-center justify-between mb-4">
+              <Card className="border border-gray-200 shadow-lg lg:sticky lg:top-24">
+                <CardContent className="p-4 sm:p-5">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
                     <div className="flex items-center gap-2">
-                      <History className="w-5 h-5 text-gray-500" />
-                      <h3 className="font-semibold text-gray-800">
+                      <History className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                      <h3 className="font-semibold text-gray-800 text-sm sm:text-base">
                         Recent Uploads
                       </h3>
                     </div>
@@ -256,10 +256,11 @@ export function UploadPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => navigate("/dashboard")}
-                      className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                      className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 text-xs sm:text-sm h-8 sm:h-9"
                     >
-                      <Plus className="w-4 h-4 mr-1" />
-                      Add Manual
+                      <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                      <span className="hidden sm:inline">Add Manual</span>
+                      <span className="sm:hidden">Add</span>
                     </Button>
                   </div>
 
