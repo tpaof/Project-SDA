@@ -5,7 +5,7 @@ dist/
 .DS_Store
 docs/
 TODO.md
-.github/
+.github/ISSUES
 .agent/
 .gemini/
 
