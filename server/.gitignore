@@ -3,3 +3,7 @@ dist/
 .env
 *.log
 uploads/
+logs/images/
+logs/ocr/
+
+/src/generated/prisma

@@ -1,4 +1,10 @@
 packages:
-  - "client"
-  - "server"
-  - "services/*"
+  - client
+  - server
+  - server/src/services/ocr-worker
+  - services/*
+
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - esbuild
+  - prisma

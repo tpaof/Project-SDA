@@ -7,3 +7,11 @@ docs/
 TODO.md
 .github/
 .agent/
+.gemini/
+
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+server/src/services/ocr-worker/logs/

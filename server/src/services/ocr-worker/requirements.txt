@@ -1,0 +1,12 @@
+--find-links https://download.pytorch.org/whl/cpu/torch_stable.html
+
+Pillow          # image I/O
+redis           # queue
+numpy<2         # image array (pin to <2 for compiled extensions compatibility)
+python-dotenv   # env config
+flask           # health + callback
+requests        # callback POST
+easyocr         # OCR engine
+# CPU-only PyTorch (ดาวน์โหลดจาก PyTorch CPU wheel index)
+torch==2.0.1+cpu
+torchvision==0.15.2+cpu

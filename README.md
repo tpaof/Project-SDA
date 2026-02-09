@@ -1,6 +1,6 @@
 # 💰 MoneyMate
 
-[![Status: Development](https://img.shields.io/badge/Status-Development-yellow)]()
+[![Status: Active Development](https://img.shields.io/badge/Status-Active_Development-brightgreen)]()
 [![Platform: Web](https://img.shields.io/badge/Platform-Web-blue)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -10,23 +10,43 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 
 ## 🛠️ Tech Stack
 
-| Technology   | Icon                                                                                                                  |
-| ------------ | --------------------------------------------------------------------------------------------------------------------- |
-| React        | ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)                    |
-| Vite         | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)                       |
-| TypeScript   | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)     |
-| Tailwind CSS | ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white) |
-| Node.js      | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)            |
-| Express.js   | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)        |
-| Python       | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)                 |
-| Flask        | ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)                    |
-| Redis        | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)                    |
-| Docker       | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)                 |
-| Kubernetes   | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)     |
-| PostgreSQL   | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)     |
-| Prisma       | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)                 |
-| Terraform    | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)        |
-| pnpm         | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)                       |
+| Technology      | Icon                                                                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| React           | ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)                             |
+| Vite            | ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)                                |
+| TypeScript      | ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)              |
+| Tailwind CSS    | ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)          |
+| React Hook Form | ![React Hook Form](https://img.shields.io/badge/React_Hook_Form-EC5990?style=for-the-badge&logo=reacthookform&logoColor=white) |
+| Zod             | ![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=zod&logoColor=white)                                   |
+| Recharts        | ![Recharts](https://img.shields.io/badge/Recharts-22B5BF?style=for-the-badge&logo=recharts&logoColor=white)                    |
+| Framer Motion   | ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)            |
+| Node.js         | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)                     |
+| Express.js      | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)                 |
+| Python          | ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)                          |
+| Flask           | ![Flask](https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white)                             |
+| EasyOCR         | ![EasyOCR](https://img.shields.io/badge/EasyOCR-000000?style=for-the-badge&logo=python&logoColor=white)                        |
+| Redis           | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)                             |
+| Docker          | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)                          |
+| Kubernetes      | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)              |
+| PostgreSQL      | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)              |
+| Prisma          | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)                          |
+| Terraform       | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)                 |
+| pnpm            | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)                                |
+
+---
+
+## 📊 Progress
+
+```
+Phase 1: Setup          [██████████] 100%
+Phase 2: Auth           [██████████] 100%
+Phase 3: Core Features  [██████████] 100%
+Phase 4: OCR            [██████████] 100%
+Phase 5: Docker         [██████████] 100%
+Phase 6-8: K8s/Infra    [░░░░░░░░░░]   0%
+─────────────────────────────────────────
+Overall:                [████████░░] ~80%
+```
 
 ---
 
@@ -67,10 +87,10 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 
 - **Node.js** >= 18.0.0
 - **pnpm** >= 8.0.0
-- **Docker** (optional, for containerized development)
-- **Python** >= 3.9 (for OCR worker)
+- **Docker** & **Docker Compose** (required for PostgreSQL database)
+- **Python** >= 3.9 (for OCR worker, optional)
 
-### Initial Setup
+### Quick Start
 
 ```bash
 # Clone repository
@@ -80,10 +100,14 @@ cd MoneyMate
 # Install all dependencies (monorepo)
 pnpm install
 
-# Setup environment variables
-cp server/.env.example server/.env
-# Edit server/.env with your configuration
+# Start everything with a single command!
+# (starts PostgreSQL, runs migrations, starts client & server)
+pnpm dev
 ```
+
+> [!NOTE]
+> Docker must be running before executing `pnpm dev`.
+> The first run will pull the PostgreSQL image which may take a moment.
 
 ---
 
@@ -98,20 +122,25 @@ cp server/.env.example server/.env
 | 🔴 **Redis**            | localhost:6379        | Cache & Message Queue    |
 | 🐍 **OCR Worker**       | http://localhost:5000 | Python Flask OCR Service |
 
-### Start Development
+### Development Commands
 
-```bash
-# Start all services (client + server)
-pnpm dev
+| Command           | Description                                                 |
+| ----------------- | ----------------------------------------------------------- |
+| `pnpm dev`        | 🚀 **Start everything** (DB + migrations + client + server) |
+| `pnpm dev:all`    | Start client & server only (assumes DB is running)          |
+| `pnpm dev:client` | Start only client                                           |
+| `pnpm dev:server` | Start only server                                           |
 
-# Start only client
-pnpm dev:client
+### Database Commands
 
-# Start only server
-pnpm dev:server
-```
+| Command           | Description                |
+| ----------------- | -------------------------- |
+| `pnpm db:up`      | Start PostgreSQL container |
+| `pnpm db:down`    | Stop PostgreSQL container  |
+| `pnpm db:migrate` | Run Prisma migrations      |
+| `pnpm db:studio`  | Open Prisma Studio GUI     |
 
-### Build for Production
+### Build & Maintenance
 
 ```bash
 # Build all packages
@@ -126,9 +155,39 @@ pnpm clean
 
 ---
 
-## 🐳 Container Development
+## Monorepo Structure
 
-### 🎯 Quick Start with Docker
+- `client` - React frontend
+- `server` - Express backend
+- `server/src/services/ocr-worker` - OCR worker service
+
+## Documentation
+
+- [Client](./client/README.md)
+- [Server](./server/README.md)
+
+## Docker Usage
+
+```bash
+# Start development environment (all services)
+pnpm docker:dev
+
+# Start production simulation
+pnpm docker:prod
+
+# Stop all containers
+pnpm docker:down
+
+# Follow logs
+pnpm docker:logs
+
+# Cleanup Docker system
+pnpm docker:prune
+```
+
+## Container Development
+
+### Quick Start with Docker
 
 ```bash
 # Build and start all containers
@@ -176,8 +235,8 @@ JWT_EXPIRES_IN=7d
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-# Database (PostgreSQL)
-DATABASE_URL=postgresql://user:password@localhost:5432/moneymate
+# Database (PostgreSQL) - matches docker-compose.yml defaults
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/moneymate
 
 # File Upload
 UPLOAD_DIR=./uploads
@@ -194,6 +253,9 @@ MAX_FILE_SIZE=10485760
 - `POST /api/auth/login` - User login (returns JWT)
 - `POST /api/auth/logout` - Logout user
 - `GET /api/auth/me` - Get current authenticated user
+- `POST /api/auth/forgot-password` - Request password reset email
+- `POST /api/auth/reset-password` - Reset password with token
+- `GET /api/auth/validate-reset-token` - Validate reset token
 
 ### Transactions (`/api/transactions`)
 
@@ -303,15 +365,19 @@ fix: resolve JWT token expiration issue
 
 - **📸 Slip Upload & OCR**: Upload receipt images and automatically extract transaction data
 - **🔐 JWT Authentication**: Secure user authentication with JSON Web Tokens
+- **🔑 Password Recovery**: Forgot password and reset password functionality with secure tokens
 - **💳 Transaction Management**: Track income and expenses with categorization
 - **📊 Dashboard Analytics**: Visualize spending patterns and financial summaries
+- **📈 Interactive Charts**: Spending breakdown, monthly trends, and category analysis with Recharts
+- **🎨 Modern UI/UX**: Polished interface with Framer Motion animations and responsive design
+- **📝 Form Validation**: Robust form handling with React Hook Form and Zod validation
 - **⚡ Event-Driven Architecture**: Async OCR processing with Redis Pub/Sub
 - **🐳 Containerized**: Docker support for all microservices
 - **☸️ Kubernetes-Ready**: K8s manifests for scalable deployment
 - **🏗️ Infrastructure as Code**: Terraform configurations for cloud provisioning
 - **🔄 Horizontal Scaling**: OCR workers scale independently based on load
 - **📦 Monorepo Structure**: Managed with pnpm workspace
-- **🎨 Modern UI**: Responsive design with React and TailwindCSS
+- **🎨 Tailwind CSS**: Utility-first styling with custom design system
 - **🔒 Security**: Password hashing, HTTPS support, helmet middleware
 
 ---
