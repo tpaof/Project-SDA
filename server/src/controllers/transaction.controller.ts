@@ -101,7 +101,7 @@ export class TransactionController {
     try {
       const transaction = await transactionService.findById(
         req.user!.userId,
-        req.params.id,
+        String(req.params.id),
       );
 
       res.status(200).json({ data: transaction });
@@ -130,7 +130,7 @@ export class TransactionController {
 
       const transaction = await transactionService.update(
         req.user!.userId,
-        req.params.id,
+        String(req.params.id),
         validation.data,
       );
 
@@ -148,7 +148,7 @@ export class TransactionController {
   // DELETE /api/transactions/:id
   async delete(req: Request, res: Response): Promise<void> {
     try {
-      await transactionService.delete(req.user!.userId, req.params.id);
+      await transactionService.delete(req.user!.userId, String(req.params.id));
 
       res.status(200).json({ message: 'Transaction deleted successfully' });
     } catch (error) {

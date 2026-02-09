@@ -1,26 +1,41 @@
-import Redis from 'ioredis';
-import 'dotenv/config';
+import * as IORedis from "ioredis";
+import "dotenv/config";
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+// NodeNext/ESM: ioredis default export is not typed as constructable; extract constructor
+const Redis = ((IORedis as any).default ?? IORedis) as new (url: string, opts?: object) => import("ioredis").Redis;
 
-/**
- * General-purpose Redis client (commands, pub, etc.).
- */
+// REDIS_URL takes precedence; otherwise build from REDIS_HOST + REDIS_PORT (Docker uses host name, not localhost)
+const REDIS_URL =
+  process.env.REDIS_URL ||
+  `redis://${process.env.REDIS_HOST || "localhost"}:${process.env.REDIS_PORT || "6379"}`;
+
+const MAX_RETRIES = 20;
+let lastErrorLog = 0;
+const ERROR_LOG_THROTTLE_MS = 5000;
+
 const redis = new Redis(REDIS_URL, {
   maxRetriesPerRequest: 3,
-  retryStrategy(times) {
-    const delay = Math.min(times * 200, 2000);
-    return delay;
+  connectTimeout: 10000,
+  retryStrategy(times: number) {
+    if (times > MAX_RETRIES) return null;
+    return Math.min(times * 500, 3000);
   },
   lazyConnect: true,
+  enableReadyCheck: true,
+  enableOfflineQueue: false,
 });
 
-redis.on('error', (err) => {
-  console.error('[redis] Connection error:', err.message);
+redis.on("error", (err: Error) => {
+  const now = Date.now();
+  if (now - lastErrorLog > ERROR_LOG_THROTTLE_MS) {
+    lastErrorLog = now;
+    console.error("[redis] Connection error:", err.message);
+  }
 });
 
-redis.on('connect', () => {
-  console.log('[redis] Connected successfully');
+redis.on("connect", () => {
+  lastErrorLog = 0;
+  console.log("[redis] Connected successfully");
 });
 
 /**
@@ -36,10 +51,7 @@ export async function connectRedis(): Promise<
     return { ok: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    // If already connected, that's fine
-    if (message.includes('already connected')) {
-      return { ok: true };
-    }
+    if (message.includes("already connected")) return { ok: true };
     return { ok: false, message };
   }
 }

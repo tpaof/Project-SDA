@@ -1,0 +1,53 @@
+# MoneyMate - Production Overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# This file overrides the base compose; do not run standalone.
+
+services:
+  postgres:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+
+  redis:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  client:
+    build:
+      target: runtime
+    restart: always
+    volumes: []   # remove hot-reload mount; use baked-in build
+    ports:
+      - "80:80"   # Nginx on 80 in prod
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+
+  server:
+    build:
+      target: runtime
+    restart: always
+    volumes: []   # remove hot-reload mount; use baked-in build
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+
+  ocr-worker:
+    restart: always
+    volumes: []   # remove hot-reload mount; use baked-in build
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1G

@@ -81,6 +81,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           <Pagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
+            pageSize={pagination.limit}
             onPageChange={onPageChange}
           />
         </motion.div>

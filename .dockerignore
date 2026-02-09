@@ -1,0 +1,81 @@
+# Dependencies & build outputs
+node_modules
+**/node_modules
+dist
+**/dist
+.turbo
+**/.turbo
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Env and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+
+# Python
+__pycache__
+**/__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+.eggs
+*.egg
+.venv
+venv
+**/venv
+
+# Logs and temp
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.tmp
+temp
+tmp
+**/.tmp
+**/temp
+**/tmp
+
+# IDE and OS
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+coverage
+.nyc_output
+**/__tests__
+**/*.test.*
+**/*.spec.*
+
+# Docs and misc (optional, keeps image smaller)
+README.md
+LICENSE
+*.md
+!server/prisma/migrations/**/*.md
+
+# Docker (avoid copying Dockerfiles into context as app code)
+docker-compose*.yml
+Dockerfile
+**/Dockerfile
+
+# Client-specific
+client/.env*
+client/*.log
+
+# Server-specific (keep prisma schema and migrations for runtime)
+server/.env
+server/*.log
+
+# OCR worker (we copy from server/src/services/ocr-worker explicitly in Dockerfile.ocr)
+# This .dockerignore applies to the root context; ocr Dockerfile copies that path

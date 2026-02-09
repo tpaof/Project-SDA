@@ -1,8 +1,10 @@
+# MoneyMate - Base & Development
+# Usage: docker compose up -d
+
 services:
-  db:
+  postgres:
     image: postgres:16-alpine
-    container_name: moneymate-db
-    restart: unless-stopped
+    container_name: moneymate-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -20,7 +22,6 @@ services:
   redis:
     image: redis:7-alpine
     container_name: moneymate-redis
-    restart: unless-stopped
     ports:
       - "6379:6379"
     healthcheck:
@@ -29,12 +30,53 @@ services:
       timeout: 5s
       retries: 5
 
+  client:
+    build:
+      context: . 
+      dockerfile: docker/Dockerfile.client
+      target: dev
+    container_name: moneymate-client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app/client
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000/api}
+
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+      target: dev
+    container_name: moneymate-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server/src:/app/server/src
+    env_file:
+      - server/.env
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/moneymate
+      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   ocr-worker:
     build:
-      context: ./server/src/services/ocr-worker
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/Dockerfile.ocr
     container_name: moneymate-ocr-worker
-    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server/src/services/ocr-worker:/app
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -42,8 +84,6 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    volumes:
-      - ./server/src/services/ocr-worker:/app
 
 volumes:
   postgres_data:

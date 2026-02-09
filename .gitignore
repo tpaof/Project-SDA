@@ -12,6 +12,6 @@ TODO.md
 
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
 server/src/services/ocr-worker/logs/

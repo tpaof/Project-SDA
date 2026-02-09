@@ -1,3 +1,25 @@
+# Server
+
+REST API server for MoneyMate.
+
+## Tech Stack
+
+Node.js, Express, Prisma, PostgreSQL, Redis.
+
+## Development
+
+TODO
+
+## Database
+
+PostgreSQL, Redis (see docker-compose.yml).
+
+## Environment Variables
+
+See [Environment Variables](#environment-variables) section below.
+
+---
+
 # MoneyMate API
 
 REST API server for MoneyMate -- a personal finance tracker built with Express, Prisma, and PostgreSQL.

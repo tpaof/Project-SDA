@@ -1,3 +1,29 @@
+# Client
+
+React frontend for MoneyMate.
+
+## Tech Stack
+
+Vite, React, TypeScript.
+
+## Development
+
+```bash
+pnpm dev
+```
+
+Runs Vite with `--host` for Docker container network access.
+
+## Build
+
+TODO
+
+## Environment Variables
+
+TODO
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
