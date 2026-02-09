@@ -27,10 +27,11 @@ A modern full-stack expense tracking system with OCR slip upload capabilities. B
 | EasyOCR         | ![EasyOCR](https://img.shields.io/badge/EasyOCR-000000?style=for-the-badge&logo=python&logoColor=white)                        |
 | Redis           | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)                             |
 | Docker          | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)                          |
-| Kubernetes      | ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)              |
+| Nginx           | ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)                             |
 | PostgreSQL      | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)              |
 | Prisma          | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)                          |
-| Terraform       | ![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)                 |
+| GitHub Actions  | ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)   |
+| GCP             | ![GCP](https://img.shields.io/badge/Google_Cloud-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white)                  |
 | pnpm            | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)                                |
 
 ---
@@ -43,9 +44,10 @@ Phase 2: Auth           [██████████] 100%
 Phase 3: Core Features  [██████████] 100%
 Phase 4: OCR            [██████████] 100%
 Phase 5: Docker         [██████████] 100%
-Phase 6-8: K8s/Infra    [░░░░░░░░░░]   0%
+Phase 6: VM Deploy      [██████████] 100%
+Phase 7: CI/CD          [██████████] 100%
 ─────────────────────────────────────────
-Overall:                [████████░░] ~80%
+Overall:                [██████████] 100%
 ```
 
 ---
@@ -53,30 +55,30 @@ Overall:                [████████░░] ~80%
 ## 🏗️ System Architecture
 
 ```
-┌─────────────────┐
-│   Frontend      │  React + Vite + TypeScript
-│   (Client)      │  Port 5173
-└────────┬────────┘
-         │ HTTP/REST
-         ▼
-┌─────────────────┐
-│   Backend API   │  Node.js + Express
-│   (Server)      │  Port 3000
-└────┬───────┬────┘
-     │       │
-     │       └──────────────┐
-     ▼                      ▼
-┌─────────────┐    ┌───────────────────┐
-│   Redis     │    │  Message Queue    │
-│   Cache     │    │  (Pub/Sub)        │
-└─────────────┘    └─────────┬─────────┘
-                             │
-                             ▼
-                   ┌───────────────────┐
-                   │   OCR Workers     │
-                   │   (Flask+Tess)    │
-                   │   Scalable        │
-                   └───────────────────┘
+                    ┌──────────────────────────────────────────────┐
+                    │            GCP Compute Engine VM              │
+                    │                                              │
+   Users ──HTTPS──► │  ┌──────────┐                                │
+                    │  │  Nginx   │ Reverse Proxy + SSL (Certbot)  │
+                    │  └────┬─────┘                                │
+                    │       │                                      │
+                    │  ┌────▼─────┐    ┌─────────────┐             │
+                    │  │  Client  │    │  PostgreSQL  │             │
+                    │  │  :8080   │    │  :5432       │             │
+                    │  └──────────┘    └──────────────┘             │
+                    │                                              │
+                    │  ┌──────────┐    ┌─────────────┐             │
+                    │  │  Server  │◄──►│    Redis     │             │
+                    │  │  :3000   │    │  Pub/Sub     │             │
+                    │  └──────────┘    └──────┬──────┘             │
+                    │                         │                    │
+                    │              ┌──────────▼───────────┐        │
+                    │              │   OCR Workers (x3)   │        │
+                    │              │   EasyOCR + Flask     │        │
+                    │              └──────────────────────┘        │
+                    └──────────────────────────────────────────────┘
+
+   GitHub ──push main──► GitHub Actions ──SSH──► VM (docker compose up)
 ```
 
 ---
@@ -120,16 +122,16 @@ pnpm dev
 | 🌐 **Client (React)**   | http://localhost:5173 | Frontend Application     |
 | 🚀 **Server (Express)** | http://localhost:3000 | Backend REST API         |
 | 🔴 **Redis**            | localhost:6379        | Cache & Message Queue    |
-| 🐍 **OCR Worker**       | http://localhost:5000 | Python Flask OCR Service |
+| 🐍 **OCR Worker**       | (internal :8080)      | Python Flask OCR Service |
 
 ### Development Commands
 
 | Command           | Description                                                 |
 | ----------------- | ----------------------------------------------------------- |
 | `pnpm dev`        | 🚀 **Start everything** (DB + migrations + client + server) |
-| `pnpm dev:all`    | Start client & server only (assumes DB is running)          |
-| `pnpm dev:client` | Start only client                                           |
-| `pnpm dev:server` | Start only server                                           |
+| `make dev`        | Same as `pnpm dev`                                          |
+| `make dev-client` | Start only client                                           |
+| `make dev-server` | Start only server                                           |
 
 ### Database Commands
 
@@ -373,8 +375,8 @@ fix: resolve JWT token expiration issue
 - **📝 Form Validation**: Robust form handling with React Hook Form and Zod validation
 - **⚡ Event-Driven Architecture**: Async OCR processing with Redis Pub/Sub
 - **🐳 Containerized**: Docker support for all microservices
-- **☸️ Kubernetes-Ready**: K8s manifests for scalable deployment
-- **🏗️ Infrastructure as Code**: Terraform configurations for cloud provisioning
+- **🖥️ VM Deployment**: Production-ready GCP Compute Engine deployment scripts
+- **🔄 CI/CD Pipeline**: GitHub Actions with SSH deploy, health checks & rollback
 - **🔄 Horizontal Scaling**: OCR workers scale independently based on load
 - **📦 Monorepo Structure**: Managed with pnpm workspace
 - **🎨 Tailwind CSS**: Utility-first styling with custom design system
@@ -403,26 +405,32 @@ MoneyMate/
 │   │   └── index.ts       # Entry point
 │   └── package.json
 │
-├── services/               # Microservices
-│   └── ocr-worker/        # Python OCR service
-│       ├── app.py
-│       └── requirements.txt
-│
 ├── docker/                 # Docker configurations
 │   ├── Dockerfile.client
 │   ├── Dockerfile.server
-│   └── Dockerfile.ocr
+│   ├── Dockerfile.ocr
+│   └── nginx.conf
 │
-├── k8s/                    # Kubernetes manifests
-│   ├── client-deployment.yaml
-│   ├── server-deployment.yaml
-│   └── ocr-worker-deployment.yaml
+├── deploy/                 # VM deployment scripts
+│   ├── setup-vm.sh         # Initial VM provisioning
+│   ├── deploy.sh           # Deployment/update script
+│   ├── setup-ssl.sh        # SSL certificate setup
+│   ├── backup-db.sh        # Database backup
+│   ├── restore-db.sh       # Database restore
+│   ├── healthcheck.sh      # Health monitoring
+│   └── nginx/
+│       └── moneymate.conf  # Nginx reverse proxy config
 │
-├── terraform/              # IaC configurations
-│   └── main.tf
+├── .github/workflows/      # CI/CD pipelines
+│   ├── ci.yml              # PR checks (lint, test, build)
+│   ├── cd.yml              # Auto deploy on push to main
+│   └── deploy-prod.yml     # Manual production deploy
 │
-├── pnpm-workspace.yaml    # Workspace configuration
-├── package.json           # Root scripts
+├── docker-compose.yml      # Base & development
+├── docker-compose.prod.yml # Production overrides
+├── Makefile                # Common commands
+├── pnpm-workspace.yaml     # Workspace configuration
+├── package.json            # Root scripts
 └── README.md
 ```
 
@@ -446,43 +454,64 @@ pnpm test:coverage
 
 ## 🚢 Deployment
 
-### Docker Build
+### VM Setup (GCP Compute Engine)
 
 ```bash
-# Build all images
-docker-compose build
+# 1. Create VM on GCP
+gcloud compute instances create moneymate-vm \
+  --zone=asia-southeast1-b \
+  --machine-type=e2-medium \
+  --image-family=ubuntu-2204-lts \
+  --image-project=ubuntu-os-cloud \
+  --boot-disk-size=40GB
 
-# Push to registry
-docker-compose push
+# 2. SSH into VM and run setup
+gcloud compute ssh moneymate-vm --zone=asia-southeast1-b
+bash deploy/setup-vm.sh
+
+# 3. Setup SSL certificate
+bash deploy/setup-ssl.sh
+
+# 4. Deploy
+bash deploy/deploy.sh
 ```
 
-### Kubernetes Deployment
+### CI/CD (GitHub Actions)
+
+CI/CD is fully automated via GitHub Actions:
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| **CI** (`ci.yml`) | PR → main | Lint, test, build, Docker build check |
+| **CD** (`cd.yml`) | Push → main | Build images → GHCR → SSH deploy → health check |
+| **Deploy Prod** (`deploy-prod.yml`) | Manual | Backup DB → deploy → smoke tests |
+
+**Required GitHub Secrets:**
+- `GCP_VM_HOST` — VM external IP
+- `GCP_VM_USER` — SSH username
+- `GCP_SSH_KEY` — SSH private key
+
+### Docker Build (Local)
 
 ```bash
-# Apply all manifests
-kubectl apply -f k8s/
+# Build all images (dev)
+make docker-build
 
-# Check deployment status
-kubectl get pods
-kubectl get services
+# Build production images
+make docker-build-prod
 
-# View logs
-kubectl logs -f deployment/moneymate-server
+# Start production locally
+make docker-up-prod
 ```
 
-### Terraform Provisioning
+### Database Backup & Restore
 
 ```bash
-cd terraform/
+# Backup (on VM)
+bash deploy/backup-db.sh
 
-# Initialize Terraform
-terraform init
-
-# Plan infrastructure changes
-terraform plan
-
-# Apply infrastructure
-terraform apply
+# Restore
+bash deploy/restore-db.sh backups/moneymate-20260210.sql.gz
 ```
 
 ---
