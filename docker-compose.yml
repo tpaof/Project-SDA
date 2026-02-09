@@ -53,6 +53,7 @@ services:
       - "3000:3000"
     volumes:
       - ./server/src:/app/server/src
+      - uploads_data:/app/server/uploads
     env_file:
       - server/.env
     environment:
@@ -62,6 +63,7 @@ services:
       - REDIS_URL=redis://redis:6379
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - API_EXTERNAL_URL=http://moneymate-server:3000
     depends_on:
       postgres:
         condition: service_healthy
@@ -73,10 +75,12 @@ services:
       context: .
       dockerfile: docker/Dockerfile.ocr
     container_name: moneymate-ocr-worker
+    platform: linux/amd64
     ports:
       - "8080:8080"
     volumes:
       - ./server/src/services/ocr-worker:/app
+      - uploads_data:/app/server/uploads
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -87,3 +91,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_data:
