@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import {
@@ -151,7 +151,6 @@ interface FilterBarProps {
   onFilterChange: (filters: FilterState) => void;
   onAddClick: () => void;
   transactions: Transaction[];
-  filteredTransactions: Transaction[];
 }
 
 // ============================================
@@ -258,7 +257,7 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
 // ============================================
 // FILTER BAR COMPONENT
 // ============================================
-const FilterBar = ({ filters, onFilterChange, onAddClick, transactions, filteredTransactions }: FilterBarProps) => {
+const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: FilterBarProps) => {
   // Get unique categories from transactions
   const categories = useMemo(() => {
     const uniqueCategories = new Set<string>();
@@ -359,7 +358,6 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions, filtered
 // MAIN DASHBOARD PAGE
 // ============================================
 export function DashboardPage() {
-  const navigate = useNavigate();
   const { user, isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const { transactions, pagination, isLoading, fetchTransactions, deleteTransaction, createTransaction, updateTransaction } = useTransactions();
   
@@ -731,7 +729,6 @@ export function DashboardPage() {
               onFilterChange={setFilters} 
               onAddClick={handleAddClick} 
               transactions={transactions}
-              filteredTransactions={filteredTransactions}
             />
           </div>
 

@@ -39,7 +39,7 @@ export function useUpload(): UseUploadReturn {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pollingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load upload history on mount
   useEffect(() => {

@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import path from 'node:path';
-import authRoutes from './routes/auth.routes.ts';
+import authRoutes from './routes/auth.routes.js';
 import transactionRoutes from './routes/transaction.routes.js';
 import slipRoutes from './routes/slip.routes.js';
 import { connectRedis } from './lib/redis.js';

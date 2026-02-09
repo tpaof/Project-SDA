@@ -10,15 +10,28 @@ export const TransactionType = {
 export type TransactionTypeValue =
   (typeof TransactionType)[keyof typeof TransactionType];
 
+// Zod 4: tuple type for z.enum; use `error` instead of required_error/invalid_type_error
+const transactionTypeEnum = z.enum(
+  ['income', 'expense'] as const,
+  {
+    error: (issue) =>
+      issue.input === undefined
+        ? 'Type is required'
+        : 'Type must be "income" or "expense"',
+  }
+);
+
 // --- Zod schemas -------------------------------------------------------------
 
 export const createTransactionSchema = z.object({
-  type: z.enum(['income', 'expense'], {
-    required_error: 'Type is required',
-    invalid_type_error: 'Type must be "income" or "expense"',
-  }),
+  type: transactionTypeEnum,
   amount: z
-    .number({ required_error: 'Amount is required', invalid_type_error: 'Amount must be a number' })
+    .number({
+      error: (issue) =>
+        issue.input === undefined
+          ? 'Amount is required'
+          : 'Amount must be a number',
+    })
     .positive('Amount must be a positive number'),
   description: z
     .string()
@@ -31,7 +44,10 @@ export const createTransactionSchema = z.object({
     .transform((v) => v.trim())
     .optional(),
   date: z
-    .string({ required_error: 'Date is required' })
+    .string({
+      error: (issue) =>
+        issue.input === undefined ? 'Date is required' : 'Invalid date format',
+    })
     .refine((v) => !Number.isNaN(Date.parse(v)), { message: 'Invalid date format' })
     .transform((v) => new Date(v)),
 });
@@ -39,7 +55,7 @@ export const createTransactionSchema = z.object({
 export const updateTransactionSchema = createTransactionSchema.partial();
 
 export const transactionFiltersSchema = z.object({
-  type: z.enum(['income', 'expense']).optional(),
+  type: z.enum(['income', 'expense'] as const).optional(),
   category: z
     .string()
     .max(100)
