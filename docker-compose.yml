@@ -74,7 +74,6 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.ocr
-    container_name: moneymate-ocr-worker
     platform: linux/amd64
     ports:
       - "8080:8080"

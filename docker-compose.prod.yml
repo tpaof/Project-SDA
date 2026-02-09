@@ -46,7 +46,9 @@ services:
   ocr-worker:
     restart: always
     volumes: []   # remove hot-reload mount; use baked-in build
+    ports: []     # remove fixed port; workers pull from Redis queue
     deploy:
+      replicas: 3   # scale OCR workers (e2-standard-4: 16GB RAM รองรับได้)
       resources:
         limits:
           cpus: "1"

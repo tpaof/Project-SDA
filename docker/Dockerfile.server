@@ -29,8 +29,6 @@ CMD ["pnpm", "--filter", "server", "run", "dev"]
 # ------------------------------
 FROM node:20-alpine AS runtime
 
-RUN addgroup -g 1000 node && adduser -u 1000 -G node -D node
-
 WORKDIR /app
 
 COPY --from=builder /app/server/package.json ./
