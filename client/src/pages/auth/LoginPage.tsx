@@ -105,14 +105,14 @@ export const LoginPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative z-10 w-full max-w-md px-4"
+        className="relative z-10 w-full max-w-md px-4 sm:px-6"
       >
         {/* Logo */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center gap-4 mb-8"
+          className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8"
         >
           <div className="relative">
             <motion.div 
@@ -120,15 +120,15 @@ export const LoginPage: React.FC = () => {
               transition={{ duration: 2, repeat: Infinity }}
               className="absolute inset-0 bg-linear-to-br from-amber-400 to-orange-500 rounded-2xl blur-xl opacity-50"
             />
-            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-3 rounded-2xl shadow-2xl shadow-orange-500/30">
-              <Wallet className="h-8 w-8 text-white" />
+            <div className="relative bg-linear-to-br from-amber-400 via-orange-500 to-red-500 p-2.5 sm:p-3 rounded-2xl shadow-2xl shadow-orange-500/30">
+              <Wallet className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
             </div>
           </div>
           <div className="text-left">
-            <h1 className="text-3xl font-bold gradient-text tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold gradient-text tracking-tight">
               MoneyMate
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
               <Sparkles className="h-3 w-3 text-amber-500" />
               Smart Income & Expense Tracker
             </p>
@@ -136,16 +136,16 @@ export const LoginPage: React.FC = () => {
         </motion.div>
 
         <Card className="shadow-2xl border-border/70">
-          <CardHeader className="space-y-2 pb-6">
-            <CardTitle className="text-2xl font-bold text-center pt-2">
+          <CardHeader className="space-y-2 pb-4 sm:pb-6 px-4 sm:px-6">
+            <CardTitle className="text-xl sm:text-2xl font-bold text-center pt-2">
               Welcome Back
             </CardTitle>
-            <CardDescription className="text-center text-base">
+            <CardDescription className="text-center text-sm sm:text-base">
               Sign in to manage your finances
             </CardDescription>
           </CardHeader>
           
-          <CardContent className="space-y-5">
+          <CardContent className="space-y-4 sm:space-y-5 px-4 sm:px-6">
             {/* Error Messages */}
             {(formError || error) && (
               <Alert variant="destructive" className="border-red-200 bg-red-50/80">
@@ -155,7 +155,7 @@ export const LoginPage: React.FC = () => {
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               {/* Email Field */}
               <div className="space-y-2.5">
                 <Label htmlFor="email" className="text-sm font-medium">
@@ -168,7 +168,7 @@ export const LoginPage: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
-                  className="h-12"
+                  className="h-11 sm:h-12"
                 />
               </div>
 
@@ -193,7 +193,7 @@ export const LoginPage: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className="h-12 pr-12"
+                    className="h-11 sm:h-12 pr-12"
                   />
                   <button
                     type="button"
@@ -223,7 +223,7 @@ export const LoginPage: React.FC = () => {
               {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full h-12 text-base font-semibold rounded-xl btn-gradient text-white border-0"
+                className="w-full h-11 sm:h-12 text-sm sm:text-base font-semibold rounded-xl btn-gradient text-white border-0"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -267,7 +267,7 @@ export const LoginPage: React.FC = () => {
         </Card>
 
         {/* Footer */}
-        <p className="text-center text-xs text-muted-foreground/70 mt-8">
+        <p className="text-center text-xs text-muted-foreground/70 mt-6 sm:mt-8">
           © 2026 MoneyMate. Smart Income & Expense Tracker
         </p>
       </motion.div>

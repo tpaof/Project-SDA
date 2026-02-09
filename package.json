@@ -9,6 +9,8 @@
     "docker:down": "docker compose down --remove-orphans",
     "docker:logs": "docker compose logs -f",
     "docker:prune": "docker system prune -f",
+    "dev": "pnpm run local:dev",
+    "test": "pnpm -r run test",
     "local:dev": "pnpm run db:up && pnpm run db:migrate && pnpm -r --parallel run dev",
     "local:dev:client": "pnpm --filter client run dev",
     "local:dev:server": "pnpm --filter server run dev",

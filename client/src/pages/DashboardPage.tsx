@@ -85,45 +85,45 @@ const TransactionRow = ({ transaction, onEdit, onDelete }: TransactionRowProps) 
       exit={{ opacity: 0 }}
       className="group border-b border-border/50 hover:bg-muted/30 transition-colors"
     >
-      <td className="py-4 pl-6">
-        <div className="flex items-center gap-3">
+      <td className="py-3 sm:py-4 pl-3 sm:pl-6 pr-2 sm:pr-4">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className={cn(
-            "w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-md",
+            "w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-white shadow-md shrink-0",
             isIncome ? "gradient-income" : "gradient-expense"
           )}>
-            {isIncome ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+            {isIncome ? <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" /> : <ArrowDownRight className="w-4 h-4 sm:w-5 sm:h-5" />}
           </div>
-          <div>
-            <p className="font-semibold text-sm">{transaction.description || transaction.category || "Uncategorized"}</p>
-            <p className="text-xs text-muted-foreground">{format(new Date(transaction.date), "MMM d, yyyy")}</p>
+          <div className="min-w-0">
+            <p className="font-semibold text-xs sm:text-sm truncate">{transaction.description || transaction.category || "Uncategorized"}</p>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">{format(new Date(transaction.date), "MMM d, yyyy")}</p>
           </div>
         </div>
       </td>
-      <td className="py-4">
-        <Badge variant={isIncome ? "success" : "destructive"} className="font-medium">
+      <td className="py-3 sm:py-4 px-2 sm:px-4 hidden sm:table-cell">
+        <Badge variant={isIncome ? "success" : "destructive"} className="font-medium text-xs">
           {transaction.category || "Uncategorized"}
         </Badge>
       </td>
-      <td className="py-4">
+      <td className="py-3 sm:py-4 px-2 sm:px-4">
         <Badge variant="outline" className={cn(
-          "font-medium",
+          "font-medium text-xs",
           isIncome ? "border-green-500/30 text-green-600 bg-green-500/10" : "border-red-500/30 text-red-600 bg-red-500/10"
         )}>
           {isIncome ? "Income" : "Expense"}
         </Badge>
       </td>
-      <td className="py-4 text-right pr-6">
+      <td className="py-3 sm:py-4 text-right pr-3 sm:pr-6 pl-2 sm:pl-4">
         <span className={cn(
-          "font-bold font-['Plus_Jakarta_Sans']",
+          "font-bold font-['Plus_Jakarta_Sans'] text-sm sm:text-base",
           isIncome ? "text-green-600" : "text-red-600"
         )}>
           {isIncome ? "+" : "-"}฿{transaction.amount.toLocaleString()}
         </span>
       </td>
-      <td className="py-4 pr-6">
+      <td className="py-3 sm:py-4 pr-3 sm:pr-6">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" className="h-8 w-8 sm:opacity-0 group-hover:opacity-100 transition-opacity">
               <MoreHorizontal className="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -189,19 +189,19 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.15 }}
-      className="flex flex-wrap items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm"
+      className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 p-3 bg-white rounded-xl border border-gray-200 shadow-sm min-w-fit"
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         <Calendar className="w-4 h-4 text-gray-500" />
         <span className="text-sm font-medium text-gray-700">Date Range:</span>
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <input
           type="date"
           value={filters.startDate}
           onChange={(e) => onFilterChange({ ...filters, startDate: e.target.value })}
-          className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           placeholder="Start Date"
         />
         <span className="text-gray-400">-</span>
@@ -209,17 +209,17 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
           type="date"
           value={filters.endDate}
           onChange={(e) => onFilterChange({ ...filters, endDate: e.target.value })}
-          className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+          className="px-2 sm:px-3 py-1.5 text-xs sm:text-sm border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
           placeholder="End Date"
         />
       </div>
 
-      <div className="flex items-center gap-1.5 ml-auto">
+      <div className="flex items-center gap-1 sm:gap-1.5 sm:ml-auto flex-wrap">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => handleQuickSelect(7)}
-          className="text-xs h-8 px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+          className="text-xs h-7 sm:h-8 px-2 sm:px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
         >
           7 Days
         </Button>
@@ -227,7 +227,7 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
           variant="ghost"
           size="sm"
           onClick={() => handleQuickSelect(30)}
-          className="text-xs h-8 px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+          className="text-xs h-7 sm:h-8 px-2 sm:px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
         >
           30 Days
         </Button>
@@ -235,7 +235,7 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
           variant="ghost"
           size="sm"
           onClick={() => handleQuickSelect(90)}
-          className="text-xs h-8 px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
+          className="text-xs h-7 sm:h-8 px-2 sm:px-2.5 text-gray-600 hover:text-orange-600 hover:bg-orange-50"
         >
           3 Months
         </Button>
@@ -244,7 +244,7 @@ const DateRangeFilter = ({ filters, onFilterChange }: DateRangeFilterProps) => {
             variant="ghost"
             size="sm"
             onClick={handleClear}
-            className="text-xs h-8 px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="text-xs h-7 sm:h-8 px-2 sm:px-2.5 text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             Clear
           </Button>
@@ -272,23 +272,26 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between"
+      className="flex flex-col gap-3"
     >
-      <div className="flex flex-wrap items-center gap-4 flex-1">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search transactions..."
-            value={filters.search}
-            onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
-            className="pl-10 w-[260px] border border-gray-200 bg-white"
-          />
-        </div>
+      {/* Row 1: Search (full width on mobile) */}
+      <div className="relative w-full">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="Search transactions..."
+          value={filters.search}
+          onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
+          className="pl-10 w-full border border-gray-200 bg-white"
+        />
+      </div>
+
+      {/* Row 2: Filters in grid layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Select
           value={filters.type}
           onValueChange={(value) => onFilterChange({ ...filters, type: value as FilterState["type"] })}
         >
-          <SelectTrigger className="w-[140px] border border-gray-200 bg-white">
+          <SelectTrigger className="w-full border border-gray-200 bg-white text-xs sm:text-sm h-10">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
@@ -297,11 +300,12 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
             <SelectItem value="expense">Expense</SelectItem>
           </SelectContent>
         </Select>
+
         <Select
           value={filters.category}
           onValueChange={(value) => onFilterChange({ ...filters, category: value })}
         >
-          <SelectTrigger className="w-[150px] border border-gray-200 bg-white">
+          <SelectTrigger className="w-full border border-gray-200 bg-white text-xs sm:text-sm h-10">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -311,6 +315,7 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
             ))}
           </SelectContent>
         </Select>
+
         <Select
           value={`${filters.sortBy}-${filters.sortOrder}`}
           onValueChange={(value) => {
@@ -318,22 +323,16 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
             onFilterChange({ ...filters, sortBy, sortOrder });
           }}
         >
-          <SelectTrigger className="w-[140px] border border-gray-200 bg-white">
-            <div className="flex items-center gap-2">
+          <SelectTrigger className="w-full border border-gray-200 bg-white text-xs sm:text-sm h-10">
+            <div className="flex items-center gap-1 sm:gap-2">
               {filters.sortBy === "date" ? (
-                <>
-                  <Calendar className="w-4 h-4 text-gray-500" />
-                  <span>Date</span>
-                </>
-              ) : (
-                <>
-                  <span>Amount</span>
-                </>
-              )}
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
+              ) : null}
+              <span>{filters.sortBy === "date" ? "Date" : "Amount"}</span>
               {filters.sortOrder === "desc" ? (
-                <ArrowDown className="w-4 h-4 text-gray-500" />
+                <ArrowDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
               ) : (
-                <ArrowUp className="w-4 h-4 text-gray-500" />
+                <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" />
               )}
             </div>
           </SelectTrigger>
@@ -344,12 +343,16 @@ const FilterBar = ({ filters, onFilterChange, onAddClick, transactions }: Filter
             <SelectItem value="amount-asc">Amount (Low to High)</SelectItem>
           </SelectContent>
         </Select>
-      </div>
 
-      <Button onClick={onAddClick} className="btn-gradient text-white border-0 gap-2">
-        <Plus className="w-4 h-4" />
-        Add Transaction
-      </Button>
+        <Button 
+          onClick={onAddClick} 
+          className="btn-gradient text-white border-0 gap-1.5 sm:gap-2 w-full h-10 text-xs sm:text-sm"
+        >
+          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Add Transaction</span>
+          <span className="sm:hidden">Add</span>
+        </Button>
+      </div>
     </motion.div>
   );
 };
@@ -560,39 +563,35 @@ export function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content - Add pt-20 for fixed header */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+      {/* Main Content - Add pt-24 for fixed header */}
+      <main className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8 py-4 sm:py-6 lg:py-8 pt-20 ">
         {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-8"
-        >
-          <h2 className="text-3xl font-bold font-['Plus_Jakarta_Sans']">
+        <div className="mb-4 sm:mb-8">
+          <h2 className="text-2xl sm:pt-12 sm:text-3xl font-bold font-['Plus_Jakarta_Sans']">
             Welcome back,👋
           </h2>
-          <p className="text-muted-foreground mt-1">Here's what's happening with your money today.</p>
-        </motion.div>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Here's what's happening with your money today.</p>
+        </div>
 
         {/* Summary Cards - Compact Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
+            className="sm:col-span-2 lg:col-span-1"
           >
             <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Total Balance</p>
-                    <h3 className="text-2xl font-bold text-orange-600">
+                    <h3 className="text-xl sm:text-2xl font-bold text-orange-600">
                       ฿{(filteredSummary.balance || 0).toLocaleString()}
                     </h3>
                   </div>
-                  <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-                    <Wallet className="w-5 h-5 text-orange-600" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-orange-100 flex items-center justify-center shrink-0">
+                    <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600" />
                   </div>
                 </div>
               </CardContent>
@@ -605,16 +604,16 @@ export function DashboardPage() {
             transition={{ duration: 0.4, delay: 0.15 }}
           >
             <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Income</p>
-                    <h3 className="text-2xl font-bold text-green-600">
+                    <h3 className="text-xl sm:text-2xl font-bold text-green-600">
                       ฿{(filteredSummary.totalIncome || 0).toLocaleString()}
                     </h3>
                   </div>
-                  <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-green-600" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-green-100 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                   </div>
                 </div>
               </CardContent>
@@ -627,16 +626,16 @@ export function DashboardPage() {
             transition={{ duration: 0.4, delay: 0.2 }}
           >
             <Card className="bg-white border border-gray-200 hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Expenses</p>
-                    <h3 className="text-2xl font-bold text-red-600">
+                    <h3 className="text-xl sm:text-2xl font-bold text-red-600">
                       ฿{(filteredSummary.totalExpense || 0).toLocaleString()}
                     </h3>
                   </div>
-                  <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-                    <TrendingDown className="w-5 h-5 text-red-600" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                    <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
                   </div>
                 </div>
               </CardContent>
@@ -645,22 +644,22 @@ export function DashboardPage() {
         </div>
 
         {/* Charts Row 1 - Pie & Bar */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-6">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-4 mb-4 sm:mb-6">
           {/* Pie Chart - Category Distribution (5 cols) */}
           <motion.div
-            className="lg:col-span-5"
+            className="xl:col-span-5"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.25 }}
           >
             <Card className="bg-white border border-gray-200 h-full">
-              <CardHeader className="pb-3 border-b border-gray-100">
+              <CardHeader className="pb-2 sm:pb-3 border-b border-gray-100 px-3 sm:px-6">
                 <CardTitle className="text-sm font-semibold text-gray-700">
                   Spending by Category
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
-                <div className="h-[260px]">
+              <CardContent className="pt-3 sm:pt-4 px-3 sm:px-6">
+                <div className="h-[220px] sm:h-[260px]">
                   <SpendingChart transactions={filteredTransactions} isLoading={isLoading} />
                 </div>
               </CardContent>
@@ -669,19 +668,19 @@ export function DashboardPage() {
 
           {/* Bar Chart - Monthly Comparison (7 cols) */}
           <motion.div
-            className="lg:col-span-7"
+            className="xl:col-span-7"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
           >
             <Card className="bg-white border border-gray-200 h-full">
-              <CardHeader className="pb-3 border-b border-gray-100">
+              <CardHeader className="pb-2 sm:pb-3 border-b border-gray-100 px-3 sm:px-6">
                 <CardTitle className="text-sm font-semibold text-gray-700">
                   Income vs Expenses
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-4">
-                <div className="h-[260px]">
+              <CardContent className="pt-3 sm:pt-4 px-3 sm:px-6">
+                <div className="h-[220px] sm:h-[260px]">
                   <MonthlyChart transactions={filteredTransactions} isLoading={isLoading} />
                 </div>
               </CardContent>
@@ -691,19 +690,19 @@ export function DashboardPage() {
 
         {/* Charts Row 2 - Balance Trend (Full Width) */}
         <motion.div
-          className="mb-6"
+          className="mb-4 sm:mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.35 }}
         >
           <Card className="bg-white border border-gray-200">
-            <CardHeader className="pb-3 border-b border-gray-100">
+            <CardHeader className="pb-2 sm:pb-3 border-b border-gray-100 px-3 sm:px-6">
               <CardTitle className="text-sm font-semibold text-gray-700">
                 Balance Trend
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-4">
-              <div className="h-[320px]">
+            <CardContent className="pt-3 sm:pt-4 px-3 sm:px-6">
+              <div className="h-[250px] sm:h-[320px]">
                 <TrendChart transactions={filteredTransactions} isLoading={isLoading} />
               </div>
             </CardContent>
@@ -711,7 +710,7 @@ export function DashboardPage() {
         </motion.div>
 
         {/* Date Range Filter */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6 overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0">
           <DateRangeFilter filters={filters} onFilterChange={setFilters} />
         </div>
 
@@ -720,10 +719,11 @@ export function DashboardPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="space-y-4"
+          className="space-y-3"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h3 className="text-xl font-bold font-['Plus_Jakarta_Sans']">Recent Transactions</h3>
+          {/* Header and Filters - Stacked on mobile */}
+          <div className="space-y-3">
+            <h3 className="text-lg sm:text-xl font-bold font-['Plus_Jakarta_Sans']">Recent Transactions</h3>
             <FilterBar 
               filters={filters} 
               onFilterChange={setFilters} 
@@ -733,23 +733,23 @@ export function DashboardPage() {
           </div>
 
           <Card className="border border-gray-200 bg-white">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="overflow-x-auto -mx-px">
+              <table className="w-full min-w-[500px]">
                 <thead>
                   <tr className="border-b border-border/50 bg-muted/30">
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <th className="text-left py-3 px-3 sm:px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Transaction
                     </th>
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <th className="text-left py-3 px-2 sm:px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
                       Category
                     </th>
-                    <th className="text-left py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <th className="text-left py-3 px-2 sm:px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="text-right py-3 px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    <th className="text-right py-3 px-2 sm:px-6 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="py-3 px-6 w-16"></th>
+                    <th className="py-3 px-3 sm:px-6 w-12 sm:w-16"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -757,31 +757,31 @@ export function DashboardPage() {
                     {isLoading ? (
                       [...Array(5)].map((_, i) => (
                         <tr key={i}>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-3">
-                              <Skeleton className="w-10 h-10 rounded-xl" />
+                          <td className="py-3 sm:py-4 px-3 sm:px-6">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <Skeleton className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl" />
                               <div className="space-y-2">
-                                <Skeleton className="h-4 w-32" />
-                                <Skeleton className="h-3 w-20" />
+                                <Skeleton className="h-4 w-24 sm:w-32" />
+                                <Skeleton className="h-3 w-16 sm:w-20" />
                               </div>
                             </div>
                           </td>
-                          <td className="py-4 px-6"><Skeleton className="h-6 w-20" /></td>
-                          <td className="py-4 px-6"><Skeleton className="h-6 w-16" /></td>
-                          <td className="py-4 px-6"><Skeleton className="h-6 w-24 ml-auto" /></td>
-                          <td className="py-4 px-6"></td>
+                          <td className="py-3 sm:py-4 px-2 sm:px-4 hidden sm:table-cell"><Skeleton className="h-6 w-20" /></td>
+                          <td className="py-3 sm:py-4 px-2 sm:px-4"><Skeleton className="h-6 w-16" /></td>
+                          <td className="py-3 sm:py-4 px-2 sm:px-6"><Skeleton className="h-6 w-20 sm:w-24 ml-auto" /></td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6"></td>
                         </tr>
                       ))
                     ) : filteredTransactions.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="py-12 text-center">
-                          <div className="flex flex-col items-center gap-4">
-                            <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-                              <Receipt className="w-8 h-8 text-muted-foreground" />
+                        <td colSpan={5} className="py-8 sm:py-12 text-center">
+                          <div className="flex flex-col items-center gap-3 sm:gap-4">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-muted flex items-center justify-center">
+                              <Receipt className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
                             </div>
                             <div>
-                              <p className="font-medium text-lg">No transactions found</p>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="font-medium text-base sm:text-lg">No transactions found</p>
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 Get started by adding your first transaction
                               </p>
                             </div>
@@ -807,54 +807,105 @@ export function DashboardPage() {
               </table>
             </div>
 
-            {/* Footer with Pagination (center) and Export (right) */}
-            <div className="py-4 px-6 border-t border-border/50 flex items-center">
-              {/* Left spacer */}
-              <div className="w-24" />
-
-              {/* Pagination - Center */}
-              <div className="flex-1 flex justify-center">
-                {pagination && pagination.totalPages >= 1 && (
-                  <Pagination
-                    currentPage={pagination.page}
-                    totalPages={pagination.totalPages}
-                    pageSize={pageSize}
-                    onPageChange={handlePageChange}
-                    onPageSizeChange={handlePageSizeChange}
-                  />
-                )}
+            {/* Footer with Pagination and Export */}
+            <div className="py-3 px-3 sm:px-6 border-t border-border/50">
+              {/* Mobile: Stacked layout */}
+              <div className="flex flex-col gap-3 sm:hidden">
+                {/* Pagination - centered with overflow protection */}
+                <div className="flex justify-center w-full">
+                  {pagination && pagination.totalPages >= 1 && (
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      pageSize={pageSize}
+                      onPageChange={handlePageChange}
+                      onPageSizeChange={handlePageSizeChange}
+                    />
+                  )}
+                </div>
+                {/* Export button - full width */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 border-gray-200 hover:bg-gray-50 w-full"
+                      disabled={filteredTransactions.length === 0}
+                    >
+                      <Download className="w-4 h-4" />
+                      Export Data
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="bg-white border border-gray-200 shadow-lg">
+                    <DropdownMenuItem
+                      onClick={() => exportToExcel(filteredTransactions, { filename: "moneymate_transactions" })}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 text-green-600" />
+                      Export as Excel
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => exportToCSV(filteredTransactions, { filename: "moneymate_transactions" })}
+                      className="gap-2 cursor-pointer"
+                    >
+                      <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+                      Export as CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
 
-              {/* Export Dropdown - Right */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 border-gray-200 hover:bg-gray-50 w-24"
-                    disabled={filteredTransactions.length === 0}
-                  >
-                    <Download className="w-4 h-4" />
-                    Export
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
-                  <DropdownMenuItem
-                    onClick={() => exportToExcel(filteredTransactions, { filename: "moneymate_transactions" })}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <FileSpreadsheet className="w-4 h-4 text-green-600" />
-                    Export as Excel
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => exportToCSV(filteredTransactions, { filename: "moneymate_transactions" })}
-                    className="gap-2 cursor-pointer"
-                  >
-                    <FileSpreadsheet className="w-4 h-4 text-blue-600" />
-                    Export as CSV
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Desktop: Horizontal layout */}
+              <div className="hidden sm:flex items-center justify-between">
+                {/* Left spacer */}
+                <div className="w-20" />
+
+                {/* Pagination - Center */}
+                <div className="flex-1 flex justify-center">
+                  {pagination && pagination.totalPages >= 1 && (
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      pageSize={pageSize}
+                      onPageChange={handlePageChange}
+                      onPageSizeChange={handlePageSizeChange}
+                    />
+                  )}
+                </div>
+
+                {/* Export Dropdown - Right */}
+                <div className="w-20 flex justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2 border-gray-200 hover:bg-gray-50"
+                        disabled={filteredTransactions.length === 0}
+                      >
+                        <Download className="w-4 h-4" />
+                        Export
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-white border border-gray-200 shadow-lg">
+                      <DropdownMenuItem
+                        onClick={() => exportToExcel(filteredTransactions, { filename: "moneymate_transactions" })}
+                        className="gap-2 cursor-pointer"
+                      >
+                        <FileSpreadsheet className="w-4 h-4 text-green-600" />
+                        Export as Excel
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => exportToCSV(filteredTransactions, { filename: "moneymate_transactions" })}
+                        className="gap-2 cursor-pointer"
+                      >
+                        <FileSpreadsheet className="w-4 h-4 text-blue-600" />
+                        Export as CSV
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
             </div>
           </Card>
         </motion.div>
