@@ -38,6 +38,7 @@ services:
     container_name: moneymate-client
     ports:
       - "5173:5173"
+      - "8080:80"    # Also expose prod Nginx port for consistency
     volumes:
       - ./client:/app/client
     environment:
@@ -75,8 +76,8 @@ services:
       context: .
       dockerfile: docker/Dockerfile.ocr
     platform: linux/amd64
-    ports:
-      - "8080:8080"
+    # No host port needed; workers communicate via Redis pub/sub
+    # Health check available within Docker network on :8080
     volumes:
       - ./server/src/services/ocr-worker:/app
       - uploads_data:/app/server/uploads

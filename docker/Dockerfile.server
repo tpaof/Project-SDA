@@ -17,6 +17,22 @@ RUN pnpm --filter server exec prisma generate
 RUN pnpm --filter server run build
 
 # ------------------------------
+# Production dependencies (use npm for flat node_modules)
+# ------------------------------
+FROM node:20-alpine AS prodinstall
+
+WORKDIR /app
+
+COPY server/package.json ./
+COPY server/prisma ./prisma
+
+# Install prod deps with npm (flat, no symlinks)
+# Keep prisma CLI for running migrations in production
+RUN npm install --omit=dev && \
+    npm install prisma && \
+    npx prisma generate
+
+# ------------------------------
 # Development stage (hot-reload)
 # ------------------------------
 FROM builder AS dev
@@ -31,10 +47,14 @@ FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
-COPY --from=builder /app/server/package.json ./
+COPY --from=prodinstall /app/node_modules ./node_modules
 COPY --from=builder /app/server/dist ./dist
-COPY --from=builder /app/server/node_modules ./node_modules
 COPY --from=builder /app/server/prisma ./prisma
+COPY --from=builder /app/server/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/server/package.json ./package.json
+
+# Create uploads directory and set permissions before switching to non-root user
+RUN mkdir -p /app/uploads && chown -R node:node /app
 
 USER node
 

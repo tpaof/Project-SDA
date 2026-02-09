@@ -100,6 +100,41 @@ run_migrations() {
 }
 
 # ------------------------------------------------------------------------------
+# Update Nginx config (substitute ${DOMAIN} template)
+# ------------------------------------------------------------------------------
+update_nginx() {
+  log "Updating Nginx config..."
+  cd "$APP_DIR"
+
+  # Read domain from .env or fallback
+  local DOMAIN
+  DOMAIN=$(grep -E '^DOMAIN=' .env 2>/dev/null | cut -d'=' -f2 || echo "")
+  if [ -z "$DOMAIN" ]; then
+    warn "DOMAIN not set in .env, skipping Nginx config update"
+    return 0
+  fi
+
+  # Substitute template and install
+  sed "s/\${DOMAIN}/$DOMAIN/g" deploy/nginx/moneymate.conf > /tmp/moneymate.conf
+  sudo cp /tmp/moneymate.conf /etc/nginx/sites-available/moneymate
+  rm -f /tmp/moneymate.conf
+
+  # Ensure symlink exists
+  if [ ! -L /etc/nginx/sites-enabled/moneymate ]; then
+    sudo ln -sf /etc/nginx/sites-available/moneymate /etc/nginx/sites-enabled/moneymate
+  fi
+
+  # Test and reload
+  if sudo nginx -t 2>&1; then
+    sudo systemctl reload nginx
+    log "Nginx config updated and reloaded ✓"
+  else
+    error "Nginx config test failed! Check the config manually."
+    return 1
+  fi
+}
+
+# ------------------------------------------------------------------------------
 # Deploy services
 # ------------------------------------------------------------------------------
 deploy_services() {
@@ -199,6 +234,7 @@ main() {
       build_images
       run_migrations
       deploy_services
+      update_nginx
       ;;
   esac
 

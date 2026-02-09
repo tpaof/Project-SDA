@@ -25,7 +25,7 @@ services:
     restart: always
     volumes: []   # remove hot-reload mount; use baked-in build
     ports:
-      - "80:80"   # Nginx on 80 in prod
+      - "8080:80"   # Host Nginx on 80; client container on 8080
     deploy:
       resources:
         limits:
@@ -36,7 +36,8 @@ services:
     build:
       target: runtime
     restart: always
-    volumes: []   # remove hot-reload mount; use baked-in build
+    volumes:
+      - uploads_data:/app/uploads   # shared uploads between server & ocr-worker
     deploy:
       resources:
         limits:
@@ -45,10 +46,10 @@ services:
 
   ocr-worker:
     restart: always
-    volumes: []   # remove hot-reload mount; use baked-in build
-    ports: []     # remove fixed port; workers pull from Redis queue
+    volumes:
+      - uploads_data:/app/uploads   # shared uploads between server & ocr-worker
     deploy:
-      replicas: 3   # scale OCR workers (e2-standard-4: 16GB RAM รองรับได้)
+      replicas: 3   # 3 workers share Redis queue for parallel OCR
       resources:
         limits:
           cpus: "1"
