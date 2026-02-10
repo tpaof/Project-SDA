@@ -78,6 +78,38 @@ export class SlipService {
   }
 
   /**
+   * Re-queue a pending/stale slip for OCR processing.
+   * Used when the original Pub/Sub job was lost (e.g. after a restart).
+   */
+  async requeuePending(userId: string, slipId: string): Promise<SlipResponse> {
+    const slip = await prisma.slip.findUnique({ where: { id: slipId } });
+
+    if (!slip) {
+      throw new AppError(404, 'Slip not found');
+    }
+    if (slip.userId !== userId) {
+      throw new AppError(403, 'You do not have permission to access this slip');
+    }
+    if (slip.status !== SlipStatus.PENDING && slip.status !== SlipStatus.FAILED) {
+      throw new AppError(400, `Slip cannot be re-queued (status: ${slip.status})`);
+    }
+
+    // Reset to pending
+    const updated = await prisma.slip.update({
+      where: { id: slipId },
+      data: { status: SlipStatus.PENDING, processedAt: null, ocrResult: undefined },
+    });
+
+    // Re-publish OCR job  
+    const filePath = `uploads/${slip.filename}`;
+    await queueService.publishOcrJob(slip.id, userId, filePath);
+
+    console.log(`[Slip] Re-queued slip ${slipId} for OCR processing`);
+
+    return this.toResponse(updated);
+  }
+
+  /**
    * Update slip status (called by the OCR worker / test script).
    */
   async updateStatus(

@@ -27,4 +27,7 @@ router.get('/:id', slipController.getStatus.bind(slipController));
 // Get OCR result for a specific slip
 router.get('/:id/result', slipController.getResult.bind(slipController));
 
+// Re-queue a pending/failed slip for OCR processing
+router.post('/:id/requeue', slipController.requeue.bind(slipController));
+
 export default router;

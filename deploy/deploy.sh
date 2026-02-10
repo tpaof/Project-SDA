@@ -9,7 +9,7 @@ set -euo pipefail
 APP_DIR="/opt/moneymate"
 COMPOSE_CMD="docker compose -f docker-compose.yml -f docker-compose.prod.yml"
 BACKUP_DIR="$APP_DIR/backups"
-HEALTH_URL="http://localhost:3000/api/health"
+HEALTH_URL="http://localhost:3000/health"
 HEALTH_TIMEOUT=30
 LOG_FILE="/var/log/moneymate/deploy-$(date +%Y%m%d-%H%M%S).log"
 
