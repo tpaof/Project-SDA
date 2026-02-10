@@ -12,8 +12,8 @@ def send_ocr_result(
     slip_id: str,
     status: str,
     extracted_data: dict,
-    max_retry: int = 3,
-    timeout: int = 5
+    max_retry: int = 5,
+    timeout: int = 10
 ):
     """
     ส่งผล OCR ไปยัง main API
@@ -46,10 +46,20 @@ def send_ocr_result(
                 f"HTTP {response.status_code}: {response.text}"
             )
 
+        except requests.exceptions.ConnectionError as e:
+            # Server might not be ready yet
+            print(f"⚠️ Callback attempt {attempt}/{max_retry} connection error: {e}")
+        except CallbackError:
+            raise
         except Exception as e:
-            if attempt == max_retry:
-                raise CallbackError(
-                    f"Callback failed after {max_retry} attempts: {e}"
-                )
+            print(f"⚠️ Callback attempt {attempt}/{max_retry} error: {e}")
 
-            time.sleep(2)  # backoff
+        if attempt == max_retry:
+            raise CallbackError(
+                f"Callback failed after {max_retry} attempts for slip {slip_id}"
+            )
+
+        # Exponential backoff: 3s, 6s, 12s, 24s
+        backoff = 3 * (2 ** (attempt - 1))
+        print(f"🔄 Retrying callback in {backoff}s...")
+        time.sleep(backoff)

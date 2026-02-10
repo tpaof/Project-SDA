@@ -101,8 +101,34 @@ export class SlipController {
 
       res.status(200).json({ status: 'ok' });
     } catch (error) {
+      // If the slip no longer exists (e.g. stale job after restart),
+      // acknowledge the callback so the worker doesn't keep retrying.
+      if (error instanceof AppError && error.statusCode === 404) {
+        console.warn(`[OCR Callback] Slip ${req.body?.slipId} not found — acknowledging stale job`);
+        res.status(200).json({ status: 'ignored', reason: 'slip not found' });
+        return;
+      }
       console.error('[OCR Callback Error]', error);
       res.status(500).json({ error: 'Internal callback error' });
+    }
+  }
+
+  // POST /api/slips/:id/requeue
+  async requeue(req: Request, res: Response): Promise<void> {
+    try {
+      const slip = await slipService.requeuePending(
+        req.user!.userId,
+        req.params.id as string,
+      );
+      res.status(200).json({ data: slip });
+    } catch (error) {
+      if (error instanceof AppError) {
+        res.status(error.statusCode).json({ error: error.message });
+        return;
+      }
+      const message =
+        error instanceof Error ? error.message : 'Failed to requeue slip';
+      res.status(500).json({ error: message });
     }
   }
 

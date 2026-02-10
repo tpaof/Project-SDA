@@ -88,6 +88,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      server:
+        condition: service_started
 
 volumes:
   postgres_data:
